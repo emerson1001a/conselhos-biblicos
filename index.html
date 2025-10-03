@@ -21,16 +21,15 @@
       background:radial-gradient(1200px 800px at 80% -10%, #1e293b 0%, #0b1324 45%, var(--bg) 100%);
       color:var(--text);
       font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
-      -webkit-tap-highlight-color:transparent;
     }
     .wrap{max-width:680px;margin:0 auto;padding:16px}
     header{text-align:center;margin-bottom:12px}
     .logo{width:52px;height:52px;margin:0 auto 10px;border-radius:14px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2),var(--ok),var(--accent));box-shadow:0 0 20px #22d3ee66}
     h1{font-size:24px;margin:0}
-    .card{background:linear-gradient(180deg,#0b1222 0%,#0a0f1a 100%);border:1px solid #1f2a44;border-radius:16px;padding:16px;box-shadow:0 4px 20px #0006;margin-top:16px}
+    .card{background:#111827dd;border:1px solid #1f2a44;border-radius:16px;padding:16px;box-shadow:0 4px 20px #0006;margin-top:16px}
     textarea{width:100%;min-height:90px;background:#0b1324;border:1px solid #1e293b;color:var(--text);border-radius:12px;padding:12px;font-size:15px}
-    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    button{flex:1;background:linear-gradient(180deg,#0ea5b64d,#22d3ee1a);border:1px solid #1f8e9c;color:var(--text);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s transform, .2s box-shadow;font-size:15px}
+    .actions,.inline-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    button{flex:1;background:linear-gradient(180deg,#0ea5b64d,#22d3ee1a);border:1px solid #1f8e9c;color:var(--text);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s;font-size:15px}
     button.primary{background:linear-gradient(180deg,#7c3aed55,#22d3ee33);border-color:#5b21b6}
     button:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0007}
     .hint{font-size:13px;color:var(--muted);margin-top:6px}
@@ -39,8 +38,6 @@
     .ref{opacity:.9;margin-top:6px;font-size:14px}
     .tags{margin-top:8px;font-size:12px;color:#cbd5e1}
     .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.4;margin-top:8px}
-    .inline-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .inline-actions button{flex:1;min-width:120px}
     .copy-toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#0b1324;border:1px solid #1e293b;color:var(--text);padding:10px 14px;border-radius:10px;box-shadow:0 6px 20px #0009;display:none;font-size:14px}
     .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
     .piece{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;top:-20px;animation:fall 2000ms linear forwards}
@@ -72,8 +69,11 @@
       <div class="prayer" id="devocional"></div>
       <div class="prayer"><strong>Oração:</strong> <span id="oracao"></span></div>
       <div class="inline-actions">
-        <button onclick="nextVerse()">Próximo</button>
+        <button onclick="nextSameTheme()">Próximo do mesmo tema</button>
+        <button onclick="randomVerse()">Aleatório</button>
+        <button onclick="restart()">Recomeçar</button>
         <button onclick="copyVerse()">Copiar</button>
+        <button onclick="shareVerse()">Compartilhar</button>
       </div>
     </section>
 
@@ -84,26 +84,13 @@
 <script>
 const VERSES = [
   {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos; apresentem tudo a Deus em oração, e a paz que excede todo entendimento guardará o coração.',note:'Deus convida você a transformar a ansiedade em diálogo com Ele.',prayer:'Senhor, entrego minhas preocupações a Ti, dá-me Tua paz.'},
-  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A companhia de Deus vence o medo.',prayer:'Senhor, fortalece-me e afasta todo medo.'},
   {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida. Quem crê em mim viverá, ainda que morra.',note:'Cristo consola no luto com promessa de vida eterna.',prayer:'Jesus, consola meu coração e renova minha esperança.'},
   {topic:'suicidio',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado, e salva os de espírito oprimido.',note:'Deus está próximo em meio à dor de quem perdeu alguém para o suicídio.',prayer:'Senhor, consola-me diante dessa perda e dá-me esperança em Ti.'},
   {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida, e a tenham em abundância.',note:'Jesus afirma que a vida é dom precioso de Deus.',prayer:'Jesus, fortalece meu coração e dá-me razões para viver em Ti.'},
-  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos os nossos pecados, Ele é fiel e justo para perdoar os pecados.',note:'Deus oferece perdão a todo arrependido.',prayer:'Senhor, confesso minhas falhas e recebo Teu perdão.'},
-  {topic:'sofrimento',ref:'Romanos 8:18',text:'Os sofrimentos do tempo presente não podem ser comparados com a glória a ser revelada em nós.',note:'O sofrimento é passageiro diante da promessa eterna.',prayer:'Senhor, dá-me força no sofrimento e esperança em Ti.'},
-  {topic:'angustia',ref:'Salmo 46:1',text:'Deus é o nosso refúgio e fortaleza, socorro bem presente na angústia.',note:'Deus está presente em meio à aflição.',prayer:'Pai, acolhe-me em minha angústia e dá-me paz.'},
-  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.',note:'A graça de Deus é suficiente em qualquer situação.',prayer:'Senhor, derrama Tua graça sobre mim e sustenta-me.'},
-  {topic:'pedido',ref:'Mateus 7:7',text:'Pedi, e dar-se-vos-á; buscai, e achareis; batei, e abrir-se-vos-á.',note:'Deus ouve os pedidos sinceros.',prayer:'Pai, apresento a Ti meu pedido e confio na Tua resposta.'},
   {topic:'rezar',ref:'Mateus 21:22',text:'E tudo o que pedirdes em oração, crendo, recebereis.',note:'A oração feita com fé abre o coração para a graça de Deus.',prayer:'Senhor, escuta minha súplica e concede-me a graça que peço.'},
-  {topic:'rezar',ref:'Salmo 91:11',text:'Porque aos seus anjos dará ordem a teu respeito.',note:'Deus envia seus anjos para proteger e amparar.',prayer:'Anjo da guarda, intercede por mim e guia meus passos.'},
-  {topic:'rezar',ref:'Lucas 1:28',text:'Alegra-te, cheia de graça, o Senhor é contigo.',note:'Maria é intercessora junto a Deus.',prayer:'Santa Maria, intercede por mim junto ao teu Filho.'},
+  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.',note:'A graça de Deus é suficiente em qualquer situação.',prayer:'Senhor, derrama Tua graça sobre mim e sustenta-me.'},
   {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha de alegria e paz.',note:'Deus é a fonte da esperança viva.',prayer:'Senhor, renova minha esperança e enche-me de paz.'},
-  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza de coisas que se esperam e a prova das que não se veem.',note:'Fé é confiança além do visível.',prayer:'Deus, fortalece minha fé mesmo sem ver.'},
-  {topic:'cura',ref:'Jeremias 30:17',text:'Eu lhe devolverei a saúde e curarei as suas feridas.',note:'Deus é médico da alma e do corpo.',prayer:'Senhor, toca minha vida com Tua cura.'},
-  {topic:'familia',ref:'Josué 24:15',text:'Eu e a minha casa serviremos ao Senhor.',note:'Família alicerçada em Deus é bênção.',prayer:'Pai, abençoa minha família e guia-nos em Teu caminho.'},
-  {topic:'solidao',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'Na solidão, Deus permanece presente.',prayer:'Senhor, acompanha-me na solidão e mostra-me Teu amor.'},
-  {topic:'tristeza',ref:'Salmo 30:5',text:'O choro pode durar uma noite, mas a alegria vem pela manhã.',note:'A tristeza não é eterna; Deus traz nova alegria.',prayer:'Pai, transforma minha tristeza em alegria pela Tua presença.'},
-  {topic:'alegria',ref:'Filipenses 4:4',text:'Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos.',note:'A alegria verdadeira vem de Deus.',prayer:'Senhor, enche meu coração de gratidão e alegria.'},
-  {topic:'amor',ref:'Romanos 8:38-39',text:'Nada poderá nos separar do amor de Deus, que está em Cristo Jesus.',note:'O amor de Deus é inabalável e eterno.',prayer:'Pai, lembra-me sempre do Teu amor que nunca falha.'}
+  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza de coisas que se esperam e a prova das que não se veem.',note:'Fé é confiança além do visível.',prayer:'Deus, fortalece minha fé mesmo sem ver.'}
 ];
 
 let currentList=[], idx=0;
@@ -125,22 +112,18 @@ function compute(){
   if(!currentList.length) currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
   idx=0;renderCurrent();burstConfetti();
 }
-
-function randomVerse(){
-  currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
-  idx=0;renderCurrent();burstConfetti();
-}
-
+function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();burstConfetti();}
 function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
-
-function nextVerse(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
-
-function copyVerse(){
+function nextSameTheme(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
+function restart(){idx=0;renderCurrent();}
+function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>toast());}
+function shareVerse(){
   if(!currentList.length)return;
   const i=currentList[idx];
-  navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>toast());
+  const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
+  if(navigator.share){navigator.share({title:'Conselho Bíblico',text});}
+  else{navigator.clipboard.writeText(text).then(()=>toast());}
 }
-
 function burstConfetti(){
   const box=document.getElementById('confetti');box.innerHTML='';
   const colors=['#22d3ee','#a78bfa','#34d399','#fbbf24','#f472b6'];
