@@ -5,20 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Conselhos Bíblicos</title>
   <style>
-    body{margin:0;background:#0f172a;color:#e5e7eb;font:16px system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    :root{
+      --bg:#0f172a;
+      --card:#111827ee;
+      --soft:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22d3ee;
+      --accent-2:#a78bfa;
+      --ok:#34d399;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:radial-gradient(1200px 800px at 80% -10%, #1e293b 0%, #0b1324 45%, var(--bg) 100%);
+      color:var(--text);
+      font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+      -webkit-tap-highlight-color:transparent;
+    }
     .wrap{max-width:680px;margin:0 auto;padding:16px}
     header{text-align:center;margin-bottom:12px}
-    .logo{width:48px;height:48px;margin:0 auto 8px;border-radius:12px;background:conic-gradient(from 180deg,#22d3ee,#a78bfa,#34d399,#22d3ee)}
-    h1{font-size:22px;margin:0}
-    .card{background:#111827ee;border-radius:16px;padding:16px;margin-top:16px}
-    textarea{width:100%;min-height:80px;background:#0b1324;border:1px solid #1e293b;color:#e5e7eb;border-radius:12px;padding:12px;font-size:15px}
-    button{background:#1f2937;border:1px solid #1f8e9c;color:#fff;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;font-size:15px;margin-top:8px;width:100%}
-    button.primary{background:#2d3748}
-    .result{display:none;margin-top:16px;background:#0b1324;padding:12px;border-radius:12px}
+    .logo{width:52px;height:52px;margin:0 auto 10px;border-radius:14px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2),var(--ok),var(--accent));box-shadow:0 0 20px #22d3ee66}
+    h1{font-size:24px;margin:0}
+    .card{background:linear-gradient(180deg,#0b1222 0%,#0a0f1a 100%);border:1px solid #1f2a44;border-radius:16px;padding:16px;box-shadow:0 4px 20px #0006;margin-top:16px}
+    textarea{width:100%;min-height:90px;background:#0b1324;border:1px solid #1e293b;color:var(--text);border-radius:12px;padding:12px;font-size:15px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    button{flex:1;background:linear-gradient(180deg,#0ea5b64d,#22d3ee1a);border:1px solid #1f8e9c;color:var(--text);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s transform, .2s box-shadow;font-size:15px}
+    button.primary{background:linear-gradient(180deg,#7c3aed55,#22d3ee33);border-color:#5b21b6}
+    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0007}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+    .result{display:none;margin-top:16px}
     .verse{font-size:18px;line-height:1.4}
     .ref{opacity:.9;margin-top:6px;font-size:14px}
-    .prayer{margin-top:8px;padding:10px;border-radius:8px;background:#1f2937;font-size:14px}
-    .tags{margin-top:6px;font-size:12px;color:#cbd5e1}
+    .tags{margin-top:8px;font-size:12px;color:#cbd5e1}
+    .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.4;margin-top:8px}
+    .inline-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .inline-actions button{flex:1;min-width:120px}
+    .copy-toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#0b1324;border:1px solid #1e293b;color:var(--text);padding:10px 14px;border-radius:10px;box-shadow:0 6px 20px #0009;display:none;font-size:14px}
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .piece{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;top:-20px;animation:fall 2000ms linear forwards}
+    @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:0}}
   </style>
 </head>
 <body>
@@ -31,20 +57,28 @@
 
     <section class="card">
       <textarea id="input" placeholder="Ex.: Estou ansioso, quero rezar, pedir uma graça..."></textarea>
-      <button onclick="compute()" class="primary">Encontrar passagem</button>
-      <button onclick="randomVerse()">Surpreenda-me</button>
-      <button onclick="clearInput()">Limpar</button>
+      <div class="actions">
+        <button onclick="compute()" class="primary">Encontrar passagem</button>
+        <button onclick="randomVerse()">Surpreenda-me</button>
+        <button onclick="clearInput()">Limpar</button>
+      </div>
+      <div class="hint">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, esperança, fé...</div>
     </section>
 
-    <section id="result" class="result">
+    <section id="result" class="card result">
       <div class="verse" id="verse"></div>
       <div class="ref" id="ref"></div>
       <div class="tags" id="tags"></div>
       <div class="prayer" id="devocional"></div>
       <div class="prayer"><strong>Oração:</strong> <span id="oracao"></span></div>
-      <button onclick="nextVerse()">Próximo versículo</button>
-      <button onclick="copyVerse()">Copiar</button>
+      <div class="inline-actions">
+        <button onclick="nextVerse()">Próximo</button>
+        <button onclick="copyVerse()">Copiar</button>
+      </div>
     </section>
+
+    <div class="copy-toast" id="toast">Copiado! 💫</div>
+    <div class="confetti" id="confetti"></div>
   </div>
 
 <script>
@@ -89,19 +123,38 @@ function compute(){
   const input=document.getElementById('input').value.toLowerCase();
   currentList=VERSES.filter(v=>input.includes(v.topic));
   if(!currentList.length) currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
-  idx=0;renderCurrent();
+  idx=0;renderCurrent();burstConfetti();
 }
 
 function randomVerse(){
   currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
-  idx=0;renderCurrent();
+  idx=0;renderCurrent();burstConfetti();
 }
 
 function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
 
 function nextVerse(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
 
-function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>alert("Copiado!"));}
+function copyVerse(){
+  if(!currentList.length)return;
+  const i=currentList[idx];
+  navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>toast());
+}
+
+function burstConfetti(){
+  const box=document.getElementById('confetti');box.innerHTML='';
+  const colors=['#22d3ee','#a78bfa','#34d399','#fbbf24','#f472b6'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='piece';
+    p.style.left=Math.random()*100+'%';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay=(Math.random()*300)+'ms';
+    p.style.transform=`rotate(${Math.random()*180}deg)`;
+    box.appendChild(p);
+  }
+  setTimeout(()=>box.innerHTML='',2200);
+}
+function toast(){const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',1400);}
 </script>
 </body>
 </html>
