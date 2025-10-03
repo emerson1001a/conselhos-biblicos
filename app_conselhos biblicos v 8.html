@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Conselhos Bíblicos para o Coração</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#111827ee;
+      --soft:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22d3ee;
+      --accent-2:#a78bfa;
+      --ok:#34d399;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, #1e293b 0%, #0b1324 45%, var(--bg) 100%);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;-webkit-tap-highlight-color:transparent}
+    .wrap{max-width:680px;margin:0 auto;padding:16px}
+    header{display:flex;gap:12px;align-items:center;justify-content:center;text-align:center}
+    .brand{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .logo{width:48px;height:48px;border-radius:12px;background:conic-gradient(from 180deg at 50% 50%, var(--accent), var(--accent-2), var(--ok), var(--accent));box-shadow:0 0 24px #22d3ee40}
+    h1{font-size:clamp(20px,5vw,28px);margin:0}
+    .card{background:linear-gradient(180deg,#0b1222 0%,#0a0f1a 100%);border:1px solid #1f2a44;border-radius:16px;padding:16px;box-shadow:0 4px 20px #0006}
+    textarea{width:100%;min-height:100px;background:#0b1324;border:1px solid #1e293b;color:var(--text);border-radius:12px;padding:12px 12px 40px;outline:none;resize:vertical;font-size:15px}
+    .actions{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    @media(min-width:500px){.actions{flex-direction:row;flex-wrap:wrap}}
+    button{flex:1;background:linear-gradient(180deg,#0ea5b64d,#22d3ee1a);border:1px solid #1f8e9c;color:var(--text);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s transform, .2s box-shadow,font-size .2s}
+    button.primary{background:linear-gradient(180deg,#7c3aed55,#22d3ee33);border-color:#5b21b6}
+    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0007}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+    .result{display:none;margin-top:16px}
+    .verse{font-size:18px;line-height:1.4}
+    .ref{opacity:.9;margin-top:6px;font-size:14px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .tag{font-size:12px;color:#cbd5e1;background:#0b1324;border:1px solid #1e293b;border-radius:999px;padding:4px 10px}
+    .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.4}
+    .inline-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .inline-actions button{flex:1;min-width:110px}
+    .copy-toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#0b1324;border:1px solid #1e293b;color:var(--text);padding:10px 14px;border-radius:10px;box-shadow:0 6px 20px #0009;display:none;font-size:14px;opacity:0;transition:opacity .4s}
+    .copy-toast.show{display:block;opacity:1}
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .piece{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;top:-20px;animation:fall 1900ms linear forwards}
+    @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:0}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>Conselhos Bíblicos</h1>
+        <div class="hint">Escreva sua situação e receba passagens bíblicas com oração.</div>
+      </div>
+    </header>
+
+    <section class="card" style="margin-top:16px">
+      <label for="input" class="sr">Descreva sua situação</label>
+      <textarea id="input" placeholder="Ex.: Quero rezar, pedir uma graça, ou preciso de consolo..."></textarea>
+      <div class="actions">
+        <button id="btn" class="primary" aria-label="Encontrar passagem bíblica">Encontrar passagem</button>
+        <button id="btn-random" aria-label="Versículo aleatório">Surpreenda-me</button>
+        <button id="btn-clear" aria-label="Limpar texto">Limpar</button>
+      </div>
+      <div class="hint">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, família, fé...</div>
+    </section>
+
+    <section id="result" class="card result">
+      <div class="verse" id="verse"></div>
+      <div class="ref" id="ref"></div>
+      <div class="tags" id="tags"></div>
+      <div class="inline-actions">
+        <button id="btn-next" aria-label="Próximo versículo">Próximo versículo</button>
+        <button id="btn-copy" aria-label="Copiar versículo">Copiar</button>
+        <button id="btn-share" aria-label="Compartilhar versículo">Compartilhar</button>
+      </div>
+      <div class="prayer" id="devocional"></div>
+      <div class="prayer" id="oracaoBox"><strong>Oração:</strong> <span id="oracao"></span></div>
+    </section>
+
+    <div class="copy-toast" id="toast">Copiado! 💫</div>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+  </div>
+
+<script>
+'use strict';
+
+// Base expandida de versículos e orações
+const VERSES = [
+  // já existentes (ansiedade, medo, etc.)
+  {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos; apresentem tudo a Deus em oração, e a paz que excede todo entendimento guardará o coração.',note:'Deus convida você a transformar a ansiedade em diálogo com Ele.',prayer:'Senhor, entrego minhas preocupações a Ti, dá-me Tua paz.'},
+  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A companhia de Deus vence o medo.',prayer:'Senhor, fortalece-me e afasta todo medo.'},
+  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida. Quem crê em mim viverá, ainda que morra.',note:'Cristo consola no luto com promessa de vida eterna.',prayer:'Jesus, consola meu coração e renova minha esperança.'},
+  {topic:'suicidio',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado, e salva os de espírito oprimido.',note:'Deus está próximo em meio à dor de quem perdeu alguém para o suicídio.',prayer:'Senhor, consola-me diante dessa perda e dá-me esperança em Ti.'},
+  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida, e a tenham em abundância.',note:'Jesus afirma que a vida é dom precioso de Deus.',prayer:'Jesus, fortalece meu coração e dá-me razões para viver em Ti.'},
+  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos os nossos pecados, Ele é fiel e justo para perdoar os pecados e nos purificar de toda injustiça.',note:'Deus oferece perdão a todo arrependido.',prayer:'Senhor, confesso minhas falhas e recebo Teu perdão.'},
+  {topic:'sofrimento',ref:'Romanos 8:18',text:'Tenho por certo que os sofrimentos do tempo presente não podem ser comparados com a glória a ser revelada em nós.',note:'O sofrimento é passageiro diante da promessa eterna.',prayer:'Senhor, dá-me força no sofrimento e esperança em Ti.'},
+  {topic:'angustia',ref:'Salmo 46:1',text:'Deus é o nosso refúgio e fortaleza, socorro bem presente na angústia.',note:'Deus está presente em meio à aflição.',prayer:'Pai, acolhe-me em minha angústia e dá-me paz.'},
+  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.',note:'A graça de Deus é suficiente em qualquer situação.',prayer:'Senhor, derrama Tua graça sobre mim e sustenta-me.'},
+  {topic:'pedido',ref:'Mateus 7:7',text:'Pedi, e dar-se-vos-á; buscai, e achareis; batei, e abrir-se-vos-á.',note:'Deus ouve os pedidos sinceros de seus filhos.',prayer:'Pai, apresento a Ti meu pedido e confio na Tua resposta.'},
+  // novo tema rezar / pedir uma graça
+  {topic:'rezar',ref:'Mateus 21:22',text:'E tudo o que pedirdes em oração, crendo, recebereis.',note:'A oração feita com fé abre o coração para a graça de Deus.',prayer:'Senhor, escuta minha súplica e concede-me, segundo a Tua vontade, a graça que peço.'},
+  {topic:'rezar',ref:'Salmo 91:11',text:'Porque aos seus anjos dará ordem a teu respeito, para te guardarem em todos os teus caminhos.',note:'Deus envia seus anjos para proteger e amparar.',prayer:'Anjo da guarda, intercede por mim e guia meus passos segundo a vontade do Senhor.'},
+  {topic:'rezar',ref:'Lucas 1:28',text:'Alegra-te, cheia de graça, o Senhor é contigo.',note:'Maria, cheia de graça, é exemplo de fé e intercessora junto a Deus.',prayer:'Santa Maria, intercede por mim junto ao teu Filho para que eu alcance a graça necessária.'},
+  // demais já existentes
+  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha de alegria e paz.',note:'Deus é a fonte da esperança viva.',prayer:'Senhor, renova minha esperança e enche-me de paz.'},
+  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza de coisas que se esperam e a prova das que não se veem.',note:'Fé é confiança além do visível.',prayer:'Deus, fortalece minha fé mesmo sem ver.'},
+  {topic:'cura',ref:'Jeremias 30:17',text:'Eu lhe devolvereis a saúde e curarei as suas feridas.',note:'Deus é médico da alma e do corpo.',prayer:'Senhor, toca minha vida com Tua cura.'},
+  {topic:'familia',ref:'Josué 24:15',text:'Eu e a minha casa serviremos ao Senhor.',note:'Família alicerçada em Deus é bênção.',prayer:'Pai, abençoa minha família e guia-nos em Teu caminho.'},
+  {topic:'solidao',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo; não te assombres, porque Eu sou o teu Deus.',note:'Na solidão, Deus permanece presente.',prayer:'Senhor, acompanha-me na solidão e mostra-me Teu amor.'},
+  {topic:'tristeza',ref:'Salmo 30:5',text:'O choro pode durar uma noite, mas a alegria vem pela manhã.',note:'A tristeza não é eterna; Deus traz nova alegria.',prayer:'Pai, transforma minha tristeza em alegria pela Tua presença.'},
+  {topic:'alegria',ref:'Filipenses 4:4',text:'Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos.',note:'A alegria verdadeira vem de Deus.',prayer:'Senhor, enche meu coração de gratidão e alegria.'},
+  {topic:'amor',ref:'Romanos 8:38-39',text:'Nada poderá nos separar do amor de Deus, que está em Cristo Jesus.',note:'O amor de Deus é inabalável e eterno.',prayer:'Pai, lembra-me sempre do Teu amor que nunca falha.'}
+];
+
+// Sinônimos
+const synonyms = {
+  ansiedade:["ansioso","preocupação","inquieto","aflição"],
+  medo:["temor","pavor","assustado"],
+  luto:["perda","falecimento","saudade","morte"],
+  suicidio:["tirou a vida","autoextermínio","acabou com a vida"],
+  "desejo-suicidio":["me matar","pensando em morrer","acabar com minha vida"],
+  pecado:["erro","culpa","transgressão","falha"],
+  sofrimento:["dor","aflição","tribulação"],
+  angustia:["opressão","aflição","ansiedade profunda"],
+  graca:["favor","benção","socorro"],
+  pedido:["clamar","súplica","oração especial"],
+  rezar:["orar","oração","pedir graça","anjos","anjo da guarda","santa","santo","graça especial"],
+  esperanca:["ânimo","confiança","expectativa"],
+  fe:["crença","acreditar","crer"],
+  cura:["saúde","enfermidade","doença"],
+  familia:["lar","casa","parentes"],
+  solidao:["sozinho","isolamento","abandono"],
+  tristeza:["depressão","abatimento","melancolia"],
+  alegria:["felicidade","contentamento","júbilo"],
+  amor:["carinho","afeição","amor de Deus"]
+};
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let currentList=[];let idx=0;
+
+function renderCurrent(){
+  const elRes=document.getElementById('result');
+  if(!currentList.length){elRes.style.display='none';return;}
+  const item=currentList[idx % currentList.length];
+  document.getElementById('verse').textContent='“'+item.text+'”';
+  document.getElementById('ref').textContent=item.ref+' • tema: '+item.topic;
+  const tags=document.getElementById('tags');tags.innerHTML='';
+  tags.appendChild(tag('#'+item.topic));
+  document.getElementById('devocional').textContent=item.note;
+  document.getElementById('oracao').textContent=item.prayer;
+  elRes.style.display='block';
+  try{localStorage.setItem("lastVerse",JSON.stringify(item));}catch(e){}
+}
+
+function tag(t){const s=document.createElement('span');s.className='tag';s.textContent=t;return s;}
+
+function compute(){
+  const input=document.getElementById('input').value.toLowerCase().trim();
+  let matches=[];
+  for(const v of VERSES){
+    if(input.includes(v.topic)) matches.push(v);
+    else if(synonyms[v.topic]?.some(s=>input.includes(s))) matches.push(v);
+  }
+  currentList=matches.length?matches:shuffle([...VERSES]);
+  idx=0;renderCurrent();burstConfetti();
+}
+
+function next(){idx++; if(idx>=currentList.length){currentList=shuffle([...VERSES]); idx=0;} renderCurrent();}
+
+function copyAll(){if(!currentList.length) return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(toast);}
+function share(){if(!currentList.length) return;const i=currentList[idx];if(navigator.share){navigator.share({title:'Conselhos Bíblicos',text:`${i.ref} — ${i.text}\n${i.note}\nOração: ${i.prayer}`});}else{copyAll();}}
+
+function burstConfetti(){const box=document.getElementById('confetti');box.innerHTML='';const colors=['#22d3ee','#a78bfa','#34d399','#fbbf24','#f472b6'];for(let i=0;i<50;i++){const p=document.createElement('div');p.className='piece';p.style.left=Math.random()*100+'%';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=(Math.random()*300)+'ms';p.style.transform=`translateY(-20px) rotate(${Math.random()*180}deg)`;box.appendChild(p);}setTimeout(()=>box.innerHTML='',2300);}
+function toast(){const t=document.getElementById('toast');t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500);}
+
+function init(){
+  document.getElementById('btn').addEventListener('click',compute);
+  document.getElementById('btn-clear').addEventListener('click',()=>{document.getElementById('input').value='';});
+  document.getElementById('btn-random').addEventListener('click',()=>{document.getElementById('input').value='';compute();});
+  document.getElementById('btn-next').addEventListener('click',next);
+  document.getElementById('btn-copy').addEventListener('click',copyAll);
+  document.getElementById('btn-share').addEventListener('click',share);
+
+  try{
+    const last=localStorage.getItem("lastVerse");
+    if(last){currentList=[JSON.parse(last)];idx=0;renderCurrent();}
+  }catch(e){}
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+</script>
+</body>
+</html>
+
