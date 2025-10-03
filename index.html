@@ -69,9 +69,7 @@
       <div class="prayer" id="devocional"></div>
       <div class="prayer"><strong>Oração:</strong> <span id="oracao"></span></div>
       <div class="inline-actions">
-        <button onclick="nextSameTheme()">Próximo do mesmo tema</button>
-        <button onclick="randomVerse()">Aleatório</button>
-        <button onclick="restart()">Recomeçar</button>
+        <button onclick="nextSameTheme()">Próximo Conselho</button>
         <button onclick="copyVerse()">Copiar</button>
         <button onclick="shareVerse()">Compartilhar</button>
       </div>
@@ -83,14 +81,41 @@
 
 <script>
 const VERSES = [
+  // ANSIEDADE
   {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos; apresentem tudo a Deus em oração, e a paz que excede todo entendimento guardará o coração.',note:'Deus convida você a transformar a ansiedade em diálogo com Ele.',prayer:'Senhor, entrego minhas preocupações a Ti, dá-me Tua paz.'},
-  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida. Quem crê em mim viverá, ainda que morra.',note:'Cristo consola no luto com promessa de vida eterna.',prayer:'Jesus, consola meu coração e renova minha esperança.'},
-  {topic:'suicidio',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado, e salva os de espírito oprimido.',note:'Deus está próximo em meio à dor de quem perdeu alguém para o suicídio.',prayer:'Senhor, consola-me diante dessa perda e dá-me esperança em Ti.'},
-  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida, e a tenham em abundância.',note:'Jesus afirma que a vida é dom precioso de Deus.',prayer:'Jesus, fortalece meu coração e dá-me razões para viver em Ti.'},
-  {topic:'rezar',ref:'Mateus 21:22',text:'E tudo o que pedirdes em oração, crendo, recebereis.',note:'A oração feita com fé abre o coração para a graça de Deus.',prayer:'Senhor, escuta minha súplica e concede-me a graça que peço.'},
-  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.',note:'A graça de Deus é suficiente em qualquer situação.',prayer:'Senhor, derrama Tua graça sobre mim e sustenta-me.'},
-  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha de alegria e paz.',note:'Deus é a fonte da esperança viva.',prayer:'Senhor, renova minha esperança e enche-me de paz.'},
-  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza de coisas que se esperam e a prova das que não se veem.',note:'Fé é confiança além do visível.',prayer:'Deus, fortalece minha fé mesmo sem ver.'}
+  {topic:'ansiedade',ref:'Mateus 6:34',text:'Não vos preocupeis com o dia de amanhã, pois o amanhã cuidará de si mesmo.',note:'Jesus ensina a viver um dia de cada vez.',prayer:'Pai, ajuda-me a viver o hoje com confiança.'},
+  {topic:'ansiedade',ref:'Salmo 55:22',text:'Lança o teu cuidado sobre o Senhor, e Ele te susterá.',note:'Deus é suporte firme nas incertezas.',prayer:'Deus, receba meus fardos e sustenta-me.'},
+
+  // MEDO
+  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A presença de Deus vence o medo.',prayer:'Senhor, fortalece-me e afasta o medo.'},
+  {topic:'medo',ref:'Salmo 56:3',text:'Em me vindo o temor, hei de confiar em ti.',note:'A fé é escudo contra o medo.',prayer:'Pai, que minha confiança seja maior que o medo.'},
+  {topic:'medo',ref:'2 Timóteo 1:7',text:'Deus não nos deu espírito de temor, mas de poder, amor e equilíbrio.',note:'O Espírito Santo gera coragem.',prayer:'Enche-me de poder e coragem pelo Teu Espírito.'},
+
+  // LUTO
+  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida. Quem crê em mim viverá, ainda que morra.',note:'Cristo consola no luto com vida eterna.',prayer:'Jesus, consola meu coração.'},
+  {topic:'luto',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado.',note:'Deus consola os de coração partido.',prayer:'Senhor, cura minha dor e dá-me esperança.'},
+  {topic:'luto',ref:'Apocalipse 21:4',text:'Ele enxugará dos seus olhos toda lágrima.',note:'Promessa de consolo eterno.',prayer:'Senhor, seca minhas lágrimas com Tua promessa.'},
+
+  // SUICÍDIO
+  {topic:'suicidio',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado.',note:'Deus está próximo de quem sofre.',prayer:'Senhor, consola os que perderam alguém.'},
+  {topic:'suicidio',ref:'João 16:33',text:'No mundo tereis aflições, mas tende bom ânimo.',note:'Jesus traz esperança em meio à dor.',prayer:'Senhor, dá-me força na aflição.'},
+  {topic:'suicidio',ref:'Isaías 41:13',text:'Eu te ajudarei, diz o Senhor.',note:'Deus segura sua mão no desespero.',prayer:'Senhor, segura minha mão.'},
+
+  // DESEJO DE SUICÍDIO
+  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida, e a tenham em abundância.',note:'A vida é dom de Deus.',prayer:'Jesus, mostra-me razões para viver.'},
+  {topic:'desejo-suicidio',ref:'Jeremias 29:11',text:'Tenho planos de paz e não de mal para vós.',note:'Deus tem um futuro para você.',prayer:'Pai, revela-me Teus planos de paz.'},
+  {topic:'desejo-suicidio',ref:'Salmo 139:14',text:'Eu te fiz de modo especial e admirável.',note:'Você tem valor diante de Deus.',prayer:'Senhor, ajuda-me a ver meu valor.'},
+
+  // PECADO
+  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos os nossos pecados, Ele é fiel e justo para perdoar.',note:'Deus perdoa todo arrependido.',prayer:'Senhor, recebo Teu perdão.'},
+  {topic:'pecado',ref:'Romanos 3:23-24',text:'Todos pecaram, mas são justificados gratuitamente pela graça.',note:'O perdão é dom gratuito.',prayer:'Jesus, lava-me com Tua graça.'},
+  {topic:'pecado',ref:'Salmo 51:10',text:'Cria em mim um coração puro, ó Deus.',note:'Deus renova quem se arrepende.',prayer:'Cria em mim pureza de coração.'},
+
+  // OUTROS TEMAS (resumido aqui, mas seguem no mesmo padrão)
+  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta.',note:'A graça sustenta.',prayer:'Senhor, derrama Tua graça.'},
+  {topic:'rezar',ref:'Mateus 21:22',text:'Tudo o que pedirdes em oração, crendo, recebereis.',note:'A oração abre portas.',prayer:'Escuta minha súplica.'},
+  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha de alegria e paz.',note:'Deus é a fonte da esperança.',prayer:'Renova minha esperança.'},
+  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza das coisas que se esperam.',note:'Fé é confiança além do visível.',prayer:'Fortalece minha fé.'}
 ];
 
 let currentList=[], idx=0;
@@ -115,7 +140,6 @@ function compute(){
 function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();burstConfetti();}
 function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
 function nextSameTheme(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
-function restart(){idx=0;renderCurrent();}
 function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>toast());}
 function shareVerse(){
   if(!currentList.length)return;
