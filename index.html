@@ -5,43 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Conselhos Bíblicos</title>
   <style>
-    :root{
-      --bg:#0f172a;
-      --card:#111827ee;
-      --soft:#1f2937;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --accent:#22d3ee;
-      --accent-2:#a78bfa;
-      --ok:#34d399;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:radial-gradient(1200px 800px at 80% -10%, #1e293b 0%, #0b1324 45%, var(--bg) 100%);
-      color:var(--text);
-      font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
-    }
+    body{margin:0;background:#0f172a;color:#e5e7eb;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
     .wrap{max-width:680px;margin:0 auto;padding:16px}
     header{text-align:center;margin-bottom:12px}
-    .logo{width:52px;height:52px;margin:0 auto 10px;border-radius:14px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2),var(--ok),var(--accent));box-shadow:0 0 20px #22d3ee66}
+    .logo{width:52px;height:52px;margin:0 auto 10px;border-radius:14px;background:conic-gradient(from 180deg,#22d3ee,#a78bfa,#34d399,#22d3ee);box-shadow:0 0 20px #22d3ee66}
     h1{font-size:24px;margin:0}
-    .card{background:#111827dd;border:1px solid #1f2a44;border-radius:16px;padding:16px;box-shadow:0 4px 20px #0006;margin-top:16px}
-    textarea{width:100%;min-height:90px;background:#0b1324;border:1px solid #1e293b;color:var(--text);border-radius:12px;padding:12px;font-size:15px}
+    .card{background:#111827dd;border-radius:16px;padding:16px;margin-top:16px}
+    textarea{width:100%;min-height:90px;background:#0b1324;border:1px solid #1e293b;color:#e5e7eb;border-radius:12px;padding:12px;font-size:15px}
     .actions,.inline-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    button{flex:1;background:linear-gradient(180deg,#0ea5b64d,#22d3ee1a);border:1px solid #1f8e9c;color:var(--text);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s;font-size:15px}
-    button.primary{background:linear-gradient(180deg,#7c3aed55,#22d3ee33);border-color:#5b21b6}
-    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0007}
-    .hint{font-size:13px;color:var(--muted);margin-top:6px}
-    .result{display:none;margin-top:16px}
+    button{flex:1;background:#1f2937;border:1px solid #1f8e9c;color:#fff;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;font-size:15px}
+    button.primary{background:#2d3748}
     .verse{font-size:18px;line-height:1.4}
     .ref{opacity:.9;margin-top:6px;font-size:14px}
     .tags{margin-top:8px;font-size:12px;color:#cbd5e1}
     .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.4;margin-top:8px}
-    .copy-toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#0b1324;border:1px solid #1e293b;color:var(--text);padding:10px 14px;border-radius:10px;box-shadow:0 6px 20px #0009;display:none;font-size:14px}
-    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-    .piece{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;top:-20px;animation:fall 2000ms linear forwards}
-    @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:0}}
+    .result{display:none;margin-top:16px}
   </style>
 </head>
 <body>
@@ -59,7 +37,7 @@
         <button onclick="randomVerse()">Surpreenda-me</button>
         <button onclick="clearInput()">Limpar</button>
       </div>
-      <div class="hint">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, esperança, fé...</div>
+      <p style="font-size:13px;color:#9ca3af">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, esperança, fé, família, etc.</p>
     </section>
 
     <section id="result" class="card result">
@@ -74,48 +52,99 @@
         <button onclick="shareVerse()">Compartilhar</button>
       </div>
     </section>
-
-    <div class="copy-toast" id="toast">Copiado! 💫</div>
-    <div class="confetti" id="confetti"></div>
   </div>
 
 <script>
 const VERSES = [
   // ANSIEDADE
-  {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos; apresentem tudo a Deus em oração, e a paz que excede todo entendimento guardará o coração.',note:'Deus convida você a transformar a ansiedade em diálogo com Ele.',prayer:'Senhor, entrego minhas preocupações a Ti, dá-me Tua paz.'},
-  {topic:'ansiedade',ref:'Mateus 6:34',text:'Não vos preocupeis com o dia de amanhã, pois o amanhã cuidará de si mesmo.',note:'Jesus ensina a viver um dia de cada vez.',prayer:'Pai, ajuda-me a viver o hoje com confiança.'},
-  {topic:'ansiedade',ref:'Salmo 55:22',text:'Lança o teu cuidado sobre o Senhor, e Ele te susterá.',note:'Deus é suporte firme nas incertezas.',prayer:'Deus, receba meus fardos e sustenta-me.'},
+  {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos... a paz de Deus guardará o coração.',note:'A ansiedade se entrega a Deus na oração.',prayer:'Senhor, entrego minhas preocupações a Ti.'},
+  {topic:'ansiedade',ref:'Mateus 6:34',text:'Não vos preocupeis com o dia de amanhã...',note:'Jesus ensina a viver o presente.',prayer:'Pai, ajuda-me a confiar no hoje.'},
+  {topic:'ansiedade',ref:'Salmo 55:22',text:'Lança o teu cuidado sobre o Senhor, e Ele te susterá.',note:'Deus carrega os fardos.',prayer:'Sustenta-me, Senhor.'},
 
   // MEDO
-  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A presença de Deus vence o medo.',prayer:'Senhor, fortalece-me e afasta o medo.'},
-  {topic:'medo',ref:'Salmo 56:3',text:'Em me vindo o temor, hei de confiar em ti.',note:'A fé é escudo contra o medo.',prayer:'Pai, que minha confiança seja maior que o medo.'},
-  {topic:'medo',ref:'2 Timóteo 1:7',text:'Deus não nos deu espírito de temor, mas de poder, amor e equilíbrio.',note:'O Espírito Santo gera coragem.',prayer:'Enche-me de poder e coragem pelo Teu Espírito.'},
+  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A presença de Deus dissipa o medo.',prayer:'Senhor, dá-me coragem.'},
+  {topic:'medo',ref:'Salmo 56:3',text:'Em me vindo o temor, confiarei em ti.',note:'A fé vence o medo.',prayer:'Que minha confiança seja maior que o medo.'},
+  {topic:'medo',ref:'2 Timóteo 1:7',text:'Deus não nos deu espírito de temor...',note:'O Espírito Santo gera poder.',prayer:'Enche-me de força e amor.'},
 
   // LUTO
-  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida. Quem crê em mim viverá, ainda que morra.',note:'Cristo consola no luto com vida eterna.',prayer:'Jesus, consola meu coração.'},
-  {topic:'luto',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado.',note:'Deus consola os de coração partido.',prayer:'Senhor, cura minha dor e dá-me esperança.'},
-  {topic:'luto',ref:'Apocalipse 21:4',text:'Ele enxugará dos seus olhos toda lágrima.',note:'Promessa de consolo eterno.',prayer:'Senhor, seca minhas lágrimas com Tua promessa.'},
+  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida.',note:'Cristo é consolo na morte.',prayer:'Jesus, consola meu coração.'},
+  {topic:'luto',ref:'Apocalipse 21:4',text:'Deus enxugará dos olhos toda lágrima.',note:'Há promessa de consolo eterno.',prayer:'Enxuga minhas lágrimas, Senhor.'},
+  {topic:'luto',ref:'Salmo 34:18',text:'O Senhor está perto dos quebrantados.',note:'Deus ampara no luto.',prayer:'Sustenta-me em minha dor.'},
 
   // SUICÍDIO
-  {topic:'suicidio',ref:'Salmo 34:18',text:'Perto está o Senhor dos que têm o coração quebrantado.',note:'Deus está próximo de quem sofre.',prayer:'Senhor, consola os que perderam alguém.'},
-  {topic:'suicidio',ref:'João 16:33',text:'No mundo tereis aflições, mas tende bom ânimo.',note:'Jesus traz esperança em meio à dor.',prayer:'Senhor, dá-me força na aflição.'},
-  {topic:'suicidio',ref:'Isaías 41:13',text:'Eu te ajudarei, diz o Senhor.',note:'Deus segura sua mão no desespero.',prayer:'Senhor, segura minha mão.'},
+  {topic:'suicidio',ref:'João 16:33',text:'No mundo tereis aflições, mas tende bom ânimo.',note:'Jesus traz esperança.',prayer:'Dá-me força nas aflições.'},
+  {topic:'suicidio',ref:'Isaías 41:13',text:'Eu te ajudarei, diz o Senhor.',note:'Deus segura sua mão.',prayer:'Segura-me pela mão, Pai.'},
+  {topic:'suicidio',ref:'Salmo 147:3',text:'Cura os quebrantados de coração.',note:'Deus restaura o ferido.',prayer:'Cura meu coração.'},
 
   // DESEJO DE SUICÍDIO
-  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida, e a tenham em abundância.',note:'A vida é dom de Deus.',prayer:'Jesus, mostra-me razões para viver.'},
-  {topic:'desejo-suicidio',ref:'Jeremias 29:11',text:'Tenho planos de paz e não de mal para vós.',note:'Deus tem um futuro para você.',prayer:'Pai, revela-me Teus planos de paz.'},
-  {topic:'desejo-suicidio',ref:'Salmo 139:14',text:'Eu te fiz de modo especial e admirável.',note:'Você tem valor diante de Deus.',prayer:'Senhor, ajuda-me a ver meu valor.'},
+  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida...',note:'Jesus é vida abundante.',prayer:'Senhor, mostra-me motivos para viver.'},
+  {topic:'desejo-suicidio',ref:'Jeremias 29:11',text:'Tenho planos de paz...',note:'Deus tem futuro preparado.',prayer:'Revela-me Teus planos.'},
+  {topic:'desejo-suicidio',ref:'Salmo 139:14',text:'Fui feito de modo especial.',note:'Você é valioso para Deus.',prayer:'Ajuda-me a ver meu valor.'},
 
   // PECADO
-  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos os nossos pecados, Ele é fiel e justo para perdoar.',note:'Deus perdoa todo arrependido.',prayer:'Senhor, recebo Teu perdão.'},
-  {topic:'pecado',ref:'Romanos 3:23-24',text:'Todos pecaram, mas são justificados gratuitamente pela graça.',note:'O perdão é dom gratuito.',prayer:'Jesus, lava-me com Tua graça.'},
-  {topic:'pecado',ref:'Salmo 51:10',text:'Cria em mim um coração puro, ó Deus.',note:'Deus renova quem se arrepende.',prayer:'Cria em mim pureza de coração.'},
+  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos os pecados...',note:'O perdão é garantido.',prayer:'Perdoa-me, Senhor.'},
+  {topic:'pecado',ref:'Romanos 3:23-24',text:'Todos pecaram... justificados pela graça.',note:'A salvação é dom gratuito.',prayer:'Jesus, lava-me com Tua graça.'},
+  {topic:'pecado',ref:'Salmo 51:10',text:'Cria em mim um coração puro.',note:'Deus renova quem se arrepende.',prayer:'Cria pureza em mim.'},
 
-  // OUTROS TEMAS (resumido aqui, mas seguem no mesmo padrão)
-  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta.',note:'A graça sustenta.',prayer:'Senhor, derrama Tua graça.'},
-  {topic:'rezar',ref:'Mateus 21:22',text:'Tudo o que pedirdes em oração, crendo, recebereis.',note:'A oração abre portas.',prayer:'Escuta minha súplica.'},
-  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha de alegria e paz.',note:'Deus é a fonte da esperança.',prayer:'Renova minha esperança.'},
-  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza das coisas que se esperam.',note:'Fé é confiança além do visível.',prayer:'Fortalece minha fé.'}
+  // SOFRIMENTO
+  {topic:'sofrimento',ref:'Romanos 8:18',text:'Os sofrimentos não se comparam à glória.',note:'A dor é passageira.',prayer:'Dá-me esperança eterna.'},
+  {topic:'sofrimento',ref:'2 Coríntios 4:17',text:'A tribulação produz peso de glória.',note:'A dor gera algo eterno.',prayer:'Faz-me forte em meio à dor.'},
+  {topic:'sofrimento',ref:'Salmo 34:19',text:'Muitas são as aflições, mas o Senhor livra.',note:'Deus livra os justos.',prayer:'Livra-me do sofrimento.'},
+
+  // ANGÚSTIA
+  {topic:'angustia',ref:'Salmo 46:1',text:'Deus é socorro na angústia.',note:'Ele é refúgio seguro.',prayer:'Acolhe-me em minha angústia.'},
+  {topic:'angustia',ref:'Salmo 18:6',text:'Na angústia clamei ao Senhor...',note:'Deus ouve o clamor.',prayer:'Escuta minha oração.'},
+  {topic:'angustia',ref:'Isaías 43:2',text:'Quando passares pelas águas...',note:'Deus promete presença.',prayer:'Acompanha-me na dor.'},
+
+  // GRAÇA
+  {topic:'graca',ref:'2 Coríntios 12:9',text:'A minha graça te basta.',note:'A graça sustenta.',prayer:'Derrama Tua graça.'},
+  {topic:'graca',ref:'Efésios 2:8',text:'Pela graça sois salvos.',note:'A salvação não é mérito.',prayer:'Obrigado pela Tua graça.'},
+  {topic:'graca',ref:'Tito 2:11',text:'A graça de Deus se manifestou...',note:'A graça ensina a viver.',prayer:'Ensina-me com Tua graça.'},
+
+  // REZAR / PEDIR
+  {topic:'rezar',ref:'Mateus 21:22',text:'Tudo o que pedirdes em oração...',note:'A oração abre portas.',prayer:'Escuta minha súplica.'},
+  {topic:'rezar',ref:'Salmo 91:11',text:'Aos anjos dará ordem...',note:'Deus envia anjos.',prayer:'Anjo da guarda, protege-me.'},
+  {topic:'rezar',ref:'Lucas 1:28',text:'Alegra-te, cheia de graça.',note:'Maria é intercessora.',prayer:'Santa Maria, intercede por mim.'},
+
+  // ESPERANÇA
+  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança vos encha...',note:'Deus é fonte de esperança.',prayer:'Renova minha esperança.'},
+  {topic:'esperanca',ref:'Jeremias 17:7',text:'Bendito o que confia no Senhor...',note:'A confiança gera esperança.',prayer:'Fortalece minha confiança.'},
+  {topic:'esperanca',ref:'Lamentações 3:21-23',text:'A esperança está nas misericórdias.',note:'Deus renova a cada manhã.',prayer:'Enche-me de esperança diária.'},
+
+  // FÉ
+  {topic:'fe',ref:'Hebreus 11:1',text:'Fé é certeza do que não se vê.',note:'Fé é confiança.',prayer:'Fortalece minha fé.'},
+  {topic:'fe',ref:'Mateus 17:20',text:'Se tiverdes fé como um grão de mostarda...',note:'A fé move montanhas.',prayer:'Aumenta minha fé.'},
+  {topic:'fe',ref:'Marcos 9:23',text:'Tudo é possível ao que crê.',note:'A fé abre possibilidades.',prayer:'Ajuda-me a crer.'},
+
+  // CURA
+  {topic:'cura',ref:'Jeremias 30:17',text:'Eu lhe devolverei a saúde...',note:'Deus cura feridas.',prayer:'Senhor, cura minha vida.'},
+  {topic:'cura',ref:'Isaías 53:5',text:'Pelas suas pisaduras fomos sarados.',note:'A cura vem de Cristo.',prayer:'Toca-me com Teu poder.'},
+  {topic:'cura',ref:'Tiago 5:15',text:'A oração da fé salvará o doente.',note:'A oração traz cura.',prayer:'Senhor, restaura minha saúde.'},
+
+  // FAMÍLIA
+  {topic:'familia',ref:'Josué 24:15',text:'Eu e minha casa serviremos ao Senhor.',note:'Família firmada em Deus.',prayer:'Abençoa minha família.'},
+  {topic:'familia',ref:'Salmo 127:1',text:'Se o Senhor não edificar a casa...',note:'Deus sustenta o lar.',prayer:'Constrói nosso lar em Ti.'},
+  {topic:'familia',ref:'Provérbios 22:6',text:'Ensina a criança no caminho...',note:'A formação familiar é eterna.',prayer:'Ajuda-me a educar com amor.'},
+
+  // SOLIDÃO
+  {topic:'solidao',ref:'Isaías 41:10',text:'Não temas, Eu sou contigo.',note:'Deus está presente.',prayer:'Acompanha-me na solidão.'},
+  {topic:'solidao',ref:'Salmo 23:4',text:'Ainda que eu ande pelo vale...',note:'Deus não abandona.',prayer:'Caminha comigo.'},
+  {topic:'solidao',ref:'Deuteronômio 31:6',text:'Não te deixarei, nem te desampararei.',note:'Deus promete presença.',prayer:'Senhor, não me deixes só.'},
+
+  // TRISTEZA
+  {topic:'tristeza',ref:'Salmo 30:5',text:'O choro pode durar uma noite...',note:'A alegria vem ao amanhecer.',prayer:'Transforma minha tristeza em alegria.'},
+  {topic:'tristeza',ref:'João 16:20',text:'A vossa tristeza se converterá em alegria.',note:'Cristo transforma a dor.',prayer:'Converte minha tristeza.'},
+  {topic:'tristeza',ref:'Salmo 42:11',text:'Por que estás abatida, ó minha alma?',note:'A esperança vence a tristeza.',prayer:'Dá-me esperança em Ti.'},
+
+  // ALEGRIA
+  {topic:'alegria',ref:'Filipenses 4:4',text:'Alegrai-vos sempre no Senhor.',note:'A alegria vem de Deus.',prayer:'Enche-me de alegria.'},
+  {topic:'alegria',ref:'Salmo 16:11',text:'Na tua presença há plenitude de alegria.',note:'Deus é fonte de alegria.',prayer:'Guia-me à tua presença.'},
+  {topic:'alegria',ref:'Neemias 8:10',text:'A alegria do Senhor é a nossa força.',note:'A alegria fortalece.',prayer:'Dá-me força na alegria.'},
+
+  // AMOR
+  {topic:'amor',ref:'Romanos 8:39',text:'Nada nos separará do amor de Deus.',note:'O amor de Deus é eterno.',prayer:'Obrigado pelo Teu amor.'},
+  {topic:'amor',ref:'1 Coríntios 13:4',text:'O amor é paciente e bondoso...',note:'O amor guia o viver.',prayer:'Ensina-me a amar.'},
+  {topic:'amor',ref:'João 15:13',text:'Ninguém tem maior amor do que dar a vida...',note:'Jesus é o exemplo de amor.',prayer:'Ajuda-me a amar como Tu amas.'}
 ];
 
 let currentList=[], idx=0;
@@ -135,33 +164,19 @@ function compute(){
   const input=document.getElementById('input').value.toLowerCase();
   currentList=VERSES.filter(v=>input.includes(v.topic));
   if(!currentList.length) currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
-  idx=0;renderCurrent();burstConfetti();
+  idx=0;renderCurrent();
 }
-function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();burstConfetti();}
+function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();}
 function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
 function nextSameTheme(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
-function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>toast());}
+function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>alert("Copiado!"));}
 function shareVerse(){
   if(!currentList.length)return;
   const i=currentList[idx];
   const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
   if(navigator.share){navigator.share({title:'Conselho Bíblico',text});}
-  else{navigator.clipboard.writeText(text).then(()=>toast());}
+  else{navigator.clipboard.writeText(text).then(()=>alert("Copiado para compartilhar!"));}
 }
-function burstConfetti(){
-  const box=document.getElementById('confetti');box.innerHTML='';
-  const colors=['#22d3ee','#a78bfa','#34d399','#fbbf24','#f472b6'];
-  for(let i=0;i<40;i++){
-    const p=document.createElement('div');p.className='piece';
-    p.style.left=Math.random()*100+'%';
-    p.style.background=colors[Math.floor(Math.random()*colors.length)];
-    p.style.animationDelay=(Math.random()*300)+'ms';
-    p.style.transform=`rotate(${Math.random()*180}deg)`;
-    box.appendChild(p);
-  }
-  setTimeout(()=>box.innerHTML='',2200);
-}
-function toast(){const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',1400);}
 </script>
 </body>
 </html>
