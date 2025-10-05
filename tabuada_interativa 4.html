@@ -2,9 +2,11 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <!-- impede zoom automático e melhora a responsividade -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tabuada Interativa</title>
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%233b82f6%22/><text x=%2250%22 y=%2270%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22>×</text></svg>">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,16 +44,12 @@
       user-select: none;
       transition: transform 0.1s ease;
     }
-    .cell:active {
-      transform: scale(0.95);
-    }
+    .cell:active { transform: scale(0.95); }
     .cell span.result {
       font-size: clamp(1.2rem, 5vw, 1.6rem);
       font-weight: 900;
       color: black;
     }
-
-    /* cores */
     .row-1 { background: #ef4444; }
     .row-2 { background: #f97316; }
     .row-3 { background: #f59e0b; }
@@ -81,9 +79,7 @@
         cell.dataset.conta = `${i} x ${j}`;
         cell.dataset.valor = i * j;
         cell.onclick = () => {
-          if (ativo && ativo !== cell) {
-            ativo.textContent = ativo.dataset.conta;
-          }
+          if (ativo && ativo !== cell) ativo.textContent = ativo.dataset.conta;
           if (cell.textContent === cell.dataset.conta) {
             cell.innerHTML = `<span class="result">${cell.dataset.valor}</span>`;
             ativo = cell;
@@ -94,6 +90,14 @@
         };
         grid.appendChild(cell);
       }
+    }
+
+    // Instalação como PWA (GitHub Pages)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .catch(err => console.log('SW falhou:', err));
+      });
     }
   </script>
 </body>
