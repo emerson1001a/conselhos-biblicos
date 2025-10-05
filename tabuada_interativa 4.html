@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <!-- impede zoom automático e melhora a responsividade -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tabuada Interativa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      margin-bottom: 20px;
+      color: #111;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+    }
+    .cell {
+      padding: clamp(10px, 2vw, 16px);
+      border-radius: 10px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      text-align: center;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+    .cell:active {
+      transform: scale(0.95);
+    }
+    .cell span.result {
+      font-size: clamp(1.2rem, 5vw, 1.6rem);
+      font-weight: 900;
+      color: black;
+    }
+
+    /* cores */
+    .row-1 { background: #ef4444; }
+    .row-2 { background: #f97316; }
+    .row-3 { background: #f59e0b; }
+    .row-4 { background: #22c55e; }
+    .row-5 { background: #84cc16; }
+    .row-6 { background: #14b8a6; }
+    .row-7 { background: #3b82f6; }
+    .row-8 { background: #8b5cf6; }
+    .row-9 { background: #ec4899; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tabuada Interativa</h1>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    let ativo = null;
+
+    for (let i = 1; i <= 9; i++) {
+      for (let j = 1; j <= 9; j++) {
+        const cell = document.createElement('div');
+        cell.className = `cell row-${i}`;
+        cell.textContent = `${i} x ${j}`;
+        cell.dataset.conta = `${i} x ${j}`;
+        cell.dataset.valor = i * j;
+        cell.onclick = () => {
+          if (ativo && ativo !== cell) {
+            ativo.textContent = ativo.dataset.conta;
+          }
+          if (cell.textContent === cell.dataset.conta) {
+            cell.innerHTML = `<span class="result">${cell.dataset.valor}</span>`;
+            ativo = cell;
+          } else {
+            cell.textContent = cell.dataset.conta;
+            ativo = null;
+          }
+        };
+        grid.appendChild(cell);
+      }
+    }
+  </script>
+</body>
+</html>
