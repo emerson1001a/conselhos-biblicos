@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -20,6 +21,7 @@
     .tags{margin-top:8px;font-size:12px;color:#cbd5e1}
     .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.4;margin-top:8px}
     .result{display:none;margin-top:16px}
+    .warn{display:none;margin-top:10px;background:#0b1324;border:1px solid #1e293b;border-radius:10px;padding:10px;font-size:14px}
   </style>
 </head>
 <body>
@@ -33,11 +35,12 @@
     <section class="card">
       <textarea id="input" placeholder="Ex.: Estou ansioso, doente, de luto, quero rezar..."></textarea>
       <div class="actions">
-        <button onclick="compute()" class="primary">Encontrar passagem</button>
-        <button onclick="randomVerse()">Surpreenda-me</button>
-        <button onclick="clearInput()">Limpar</button>
+        <button id="btnFind" class="primary" type="button">Encontrar passagem</button>
+        <button id="btnSurprise" type="button">Surpreenda-me</button>
+        <button id="btnClear" type="button">Limpar</button>
       </div>
-      <p style="font-size:13px;color:#9ca3af">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, esperança, fé, família, etc.</p>
+      <p style="font-size:13px;color:#9ca3af">Temas: ansiedade, medo, luto, suicídio, pecado, sofrimento, graça, rezar, esperança, fé, família, cura, etc.</p>
+      <div id="warn" class="warn"></div>
     </section>
 
     <section id="result" class="card result">
@@ -47,40 +50,56 @@
       <div class="prayer" id="devocional"></div>
       <div class="prayer"><strong>Oração:</strong> <span id="oracao"></span></div>
       <div class="inline-actions">
-        <button onclick="nextSameTheme()">Próximo Conselho</button>
-        <button onclick="copyVerse()">Copiar</button>
-        <button onclick="shareVerse()">Compartilhar</button>
+        <button id="btnNext" type="button">Próximo Conselho</button>
+        <button id="btnCopy" type="button">Copiar</button>
+        <button id="btnShare" type="button">Compartilhar</button>
       </div>
     </section>
   </div>
 
-  <!-- ÁUDIO PARA O TEMA SUICÍDIO -->
+  <!-- ÁUDIO PARA O TEMA SUICÍDIO (opcional: deixe o arquivo ao lado do index.html) -->
   <audio id="audioSuicidio" src="suicidio.m4a" preload="auto"></audio>
 
 <script>
-// === SINÔNIMOS ===
+/* -------------------- Utilidades robustas -------------------- */
+// Normaliza texto para comparação (minúsculas + sem acentos)
+function norm(s){
+  return (s||'')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu,'');
+}
+// Mostra alerta amigável (em vez de “nada acontecer”)
+function showWarn(msg){
+  const w=document.getElementById('warn');
+  w.textContent=msg;
+  w.style.display='block';
+  setTimeout(()=>{ w.style.display='none'; }, 4000);
+}
+
+/* -------------------- Sinônimos (ampliados) -------------------- */
 const TOPIC_KEYS = [
-  {topic:'ansiedade',keys:['ansiedade','preocupado','preocupação','aflição']},
-  {topic:'medo',keys:['medo','temor','assustado','pavor']},
+  {topic:'ansiedade',keys:['ansiedade','ansioso','ansiosa','preocupacao','preocupado','preocupada','aflicao','aflicao','aflicao','angustia','angustiado','angustiada']},
+  {topic:'medo',keys:['medo','temor','assustado','assustada','pavor']},
   {topic:'luto',keys:['luto','morte','falecimento','perda']},
-  {topic:'suicidio',keys:['suicídio','suicidio','suicidou','tirou a vida']},
-  {topic:'desejo-suicidio',keys:['me matar','tirar a vida','não quero viver','suicidar']},
+  {topic:'suicidio',keys:['suicidio','suicidio','suicidou','tirou a vida']},
+  {topic:'desejo-suicidio',keys:['me matar','tirar a vida','nao quero viver','suicidar']},
   {topic:'pecado',keys:['pecado','erro','falha','culpa']},
-  {topic:'sofrimento',keys:['sofrimento','dor','provação','tribulação']},
-  {topic:'angustia',keys:['angústia','angustiado','aflição','aperto no coração']},
-  {topic:'graca',keys:['graça','favor','misericórdia']},
-  {topic:'rezar',keys:['rezar','oração','pedir','súplica','graça','anjo','santa']},
-  {topic:'esperanca',keys:['esperança','confiança','futuro']},
-  {topic:'fe',keys:['fé','crença','acreditar']},
-  {topic:'cura',keys:['cura','doença','enfermidade','saúde','adoentado']},
-  {topic:'familia',keys:['família','casa','lar','filhos','casamento']},
-  {topic:'solidao',keys:['solidão','sozinho','abandono','isolado']},
-  {topic:'tristeza',keys:['tristeza','triste','abatido','desânimo','chorar']},
+  {topic:'sofrimento',keys:['sofrimento','dor','provacao','tribulacao']},
+  {topic:'angustia',keys:['angustia','aperto no coracao']},
+  {topic:'graca',keys:['graca','favor','misericordia']},
+  {topic:'rezar',keys:['rezar','oracao','pedir','suplica','anjo','santa']},
+  {topic:'esperanca',keys:['esperanca','confianca','futuro']},
+  {topic:'fe',keys:['fe','crenca','acreditar']},
+  {topic:'cura',keys:['cura','doenca','enfermidade','saude','adoentado','doente','enfermo','minha irma esta doente','minha mae esta doente','meu pai esta doente']},
+  {topic:'familia',keys:['familia','casa','lar','filhos','casamento']},
+  {topic:'solidao',keys:['solidao','sozinho','abandono','isolado','sozinha','isolada']},
+  {topic:'tristeza',keys:['tristeza','triste','abatido','desanimo','chorar','depressao']},
   {topic:'alegria',keys:['alegria','feliz','contentamento','gozo']},
-  {topic:'amor',keys:['amor','amar','carinho','afetos','paixão']}
+  {topic:'amor',keys:['amor','amar','carinho','afeto','paixao']}
 ];
 
-// === LISTA DE VERSÍCULOS ===
+/* -------------------- Versículos -------------------- */
 const VERSES = [
   {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos... a paz de Deus guardará o coração.',note:'A ansiedade se entrega a Deus na oração.',prayer:'Senhor, entrego minhas preocupações a Ti.'},
   {topic:'ansiedade',ref:'Mateus 6:34',text:'Não vos preocupeis com o dia de amanhã...',note:'Jesus ensina a viver o presente.',prayer:'Pai, ajuda-me a confiar no hoje.'},
@@ -95,10 +114,10 @@ const VERSES = [
   {topic:'luto',ref:'Salmo 34:18',text:'O Senhor está perto dos quebrantados.',note:'Deus ampara no luto.',prayer:'Sustenta-me em minha dor.'},
 
   {topic:'suicidio',
-  ref:'João 16:33',
-  text:'No mundo tereis aflições, mas tende bom ânimo.',
-  note:'Jesus traz esperança.',
-  prayer:`Senhor Deus de infinita misericórdia,
+   ref:'João 16:33',
+   text:'No mundo tereis aflições, mas tende bom ânimo.',
+   note:'Jesus traz esperança.',
+   prayer:`Senhor Deus de infinita misericórdia,
 neste momento em que este(a) teu filho(a) se sente sobrecarregado(a), acolhe sua dor e derrama sobre ele(a) o Teu amor que cura e fortalece.
 Dissipa as trevas do desespero e faz nascer a luz da esperança.
 Envia pessoas que possam ajudá-lo(a) a encontrar apoio e novo sentido para a vida.
@@ -112,7 +131,11 @@ Sua vida é preciosa. Você não está sozinho(a). 🌱`},
   {topic:'suicidio',ref:'Isaías 41:13',text:'Eu te ajudarei, diz o Senhor.',note:'Deus segura sua mão.',prayer:'Segura-me pela mão, Pai.'},
   {topic:'suicidio',ref:'Salmo 147:3',text:'Cura os quebrantados de coração.',note:'Deus restaura o ferido.',prayer:'Cura meu coração.'},
 
-  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida...',note:'Jesus é vida abundante.', prayer:`Senhor Deus de infinita misericórdia,
+  {topic:'desejo-suicidio',
+   ref:'João 10:10',
+   text:'Eu vim para que tenham vida...',
+   note:'Jesus é vida abundante.',
+   prayer:`Senhor Deus de infinita misericórdia,
 neste momento em que este(a) teu filho(a) se sente sobrecarregado(a), acolhe sua dor e derrama sobre ele(a) o Teu amor que cura e fortalece.
 Dissipa as trevas do desespero e faz nascer a luz da esperança.
 Envia pessoas que possam ajudá-lo(a) a encontrar apoio e novo sentido para a vida.
@@ -123,70 +146,97 @@ Amém. 🙏
 🟢 Procure também sua paróquia ou um padre de confiança para conversar e receber apoio espiritual.
 Sua vida é preciosa. Você não está sozinho(a). 🌱`},
   {topic:'desejo-suicidio',ref:'Jeremias 29:11',text:'Tenho planos de paz...',note:'Deus tem futuro preparado.',prayer:'Revela-me Teus planos.'},
-  {topic:'desejo-suicidio',ref:'Salmo 139:14',text:'Fui feito de modo especial.',note:'Você é valioso para Deus.',prayer:'Ajuda-me a ver meu valor.'},
-
-  // ... (restante dos seus versículos: pecado, sofrimento, etc.)
+  {topic:'desejo-suicidio',ref:'Salmo 139:14',text:'Fui feito de modo especial.',note:'Você é valioso para Deus.',prayer:'Ajuda-me a ver meu valor.'}
 ];
 
-// === VARIÁVEIS ===
+/* -------------------- Estado -------------------- */
 let currentList=[], idx=0;
 
-// === FUNÇÃO DE ÁUDIO ===
+/* -------------------- Áudio seguro -------------------- */
 function playAudioIfNeeded(topic){
   const audio=document.getElementById('audioSuicidio');
+  if(!audio) return;
   if(topic==='suicidio' || topic==='desejo-suicidio'){
-    audio.currentTime=0;
-    audio.play().catch(()=>{}); // evita erro em autoplay bloqueado
+    try{ audio.currentTime=0; audio.play().catch(()=>{}); }catch(_){}
   }else{
-    audio.pause();
-    audio.currentTime=0;
+    try{ audio.pause(); audio.currentTime=0; }catch(_){}
   }
 }
 
-// === FUNÇÕES DE RENDERIZAÇÃO ===
+/* -------------------- Render -------------------- */
 function renderCurrent(){
-  if(!currentList.length){document.getElementById('result').style.display='none';return;}
+  const box=document.getElementById('result');
+  if(!currentList.length){ box.style.display='none'; return; }
   const item=currentList[idx % currentList.length];
   document.getElementById('verse').textContent='“'+item.text+'”';
   document.getElementById('ref').textContent=item.ref+' • tema: '+item.topic;
   document.getElementById('tags').textContent='#'+item.topic;
   document.getElementById('devocional').textContent=item.note;
   document.getElementById('oracao').textContent=item.prayer;
-  document.getElementById('result').style.display='block';
+  box.style.display='block';
   playAudioIfNeeded(item.topic);
 }
 
-// === LÓGICA PRINCIPAL ===
-function findTopic(input){
-  input=input.toLowerCase();
+/* -------------------- Busca de tema (robusta) -------------------- */
+function findTopic(inputRaw){
+  const s = norm(inputRaw);
   for(const t of TOPIC_KEYS){
-    if(t.keys.some(k=>input.includes(k))) return t.topic;
+    for(const k of t.keys){
+      if(s.includes(norm(k))) return t.topic;
+    }
   }
   return null;
 }
 
+/* -------------------- Ações -------------------- */
 function compute(){
-  const input=document.getElementById('input').value.toLowerCase();
-  const foundTopic=findTopic(input);
-  if(foundTopic){
-    currentList=VERSES.filter(v=>v.topic===foundTopic);
-  }else{
-    currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
+  try{
+    const input=document.getElementById('input').value || '';
+    const foundTopic=findTopic(input);
+    if(foundTopic){
+      currentList=VERSES.filter(v=>v.topic===foundTopic);
+    }else{
+      // sempre responde: mostra aviso leve e traz algo edificante
+      showWarn('Não identifiquei um tema específico. Mostrando um conselho aleatório.');
+      currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
+    }
+    idx=0; renderCurrent();
+  }catch(err){
+    console.error(err);
+    showWarn('Ocorreu um erro inesperado. Tente novamente.');
   }
-  idx=0;renderCurrent();
 }
-
-function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();}
-function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
-function nextSameTheme(){idx++;if(idx>=currentList.length) idx=0;renderCurrent();}
-function copyVerse(){if(!currentList.length)return;const i=currentList[idx];navigator.clipboard.writeText(`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`).then(()=>alert("Copiado!"));}
-function shareVerse(){
-  if(!currentList.length)return;
+function randomVerse(){
+  currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
+  idx=0; renderCurrent();
+}
+function clearInput(){
+  const r=document.getElementById('result');
+  document.getElementById('input').value='';
+  r.style.display='none';
+}
+function nextSameTheme(){ if(!currentList.length) return; idx=(idx+1)%currentList.length; renderCurrent(); }
+function copyVerse(){
+  if(!currentList.length) return;
   const i=currentList[idx];
   const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
-  if(navigator.share){navigator.share({title:'Conselho Bíblico',text});}
-  else{navigator.clipboard.writeText(text).then(()=>alert("Copiado para compartilhar!"));}
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showWarn('Copiado!')); }
 }
+function shareVerse(){
+  if(!currentList.length) return;
+  const i=currentList[idx];
+  const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
+  if(navigator.share){ navigator.share({title:'Conselho Bíblico',text}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showWarn('Copiado para compartilhar!')); }
+}
+
+/* -------------------- Liga os botões sem depender de inline -------------------- */
+document.getElementById('btnFind').addEventListener('click', compute);
+document.getElementById('btnSurprise').addEventListener('click', randomVerse);
+document.getElementById('btnClear').addEventListener('click', clearInput);
+document.getElementById('btnNext').addEventListener('click', nextSameTheme);
+document.getElementById('btnCopy').addEventListener('click', copyVerse);
+document.getElementById('btnShare').addEventListener('click', shareVerse);
 </script>
 </body>
 </html>
