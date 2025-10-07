@@ -13,14 +13,31 @@
     .card{background:#111827dd;border-radius:16px;padding:16px;margin-top:16px;border:1px solid #1f2937}
     textarea{width:100%;min-height:100px;background:#0b1324;border:1px solid #1e293b;color:#e5e7eb;border-radius:12px;padding:12px;font-size:15px}
     .actions,.inline-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    button{flex:1;background:#1f2937;border:1px solid #1f8e9c;color:#fff;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;font-size:15px}
+    button{flex:1;background:#1f2937;border:1px solid #1f8e9c;color:#fff;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;font-size:15px;transition:background .25s}
+    button:hover{background:#334155}
     button.primary{background:#2d3748}
     .verse{font-size:18px;line-height:1.45}
     .ref{opacity:.9;margin-top:6px;font-size:14px}
     .tags{margin-top:8px;font-size:12px;color:#cbd5e1}
     .prayer{background:#0b1324;border:1px solid #1e293b;border-radius:12px;padding:10px;font-size:14px;line-height:1.45;margin-top:8px}
     .result{display:none;margin-top:16px}
-    .warn{display:none;margin-top:12px;background:#0b1324;border:1px solid #1e293b;border-radius:10px;padding:10px;font-size:14px}
+    .warn{display:none;margin-top:12px;background:#0b1324;border:1px solid #1e293b;border-radius:10px;padding:10px;font-size:14px;text-align:center}
+
+    /* Modal de vídeo */
+    #videoModal{
+      display:none;opacity:0;position:fixed;z-index:1000;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.85);justify-content:center;align-items:center;flex-direction:column;
+      transition:opacity .4s ease;
+    }
+    #videoModal.active{display:flex;opacity:1;}
+    #videoModal h2{margin-bottom:16px;font-size:20px;color:#fff;text-align:center}
+    #closeModal{
+      position:absolute;top:20px;right:30px;font-size:18px;background:#1f2937;border:1px solid #1f8e9c;
+      color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;transition:background .25s;
+    }
+    #closeModal:hover{background:#334155}
+    video{width:90%;max-width:720px;border-radius:12px;box-shadow:0 0 20px #000;}
+
     @media (max-width:480px){
       .wrap{padding:12px}
       .inline-actions button{flex:1 1 100%}
@@ -55,40 +72,39 @@
       <div class="prayer" id="devocional"></div>
       <div class="prayer"><strong>Oração:</strong> <span id="oracao"></span></div>
       <div class="inline-actions">
-        <button id="btnNext" type="button">Próximo Conselho</button>
+        <button id="btnPadre" type="button">Mensagem do Padre 🎥</button>
         <button id="btnCopy" type="button">Copiar</button>
         <button id="btnShare" type="button">Compartilhar</button>
       </div>
     </section>
   </div>
 
-  <!-- opcional: deixe suicidio.m4a na mesma pasta do index.html -->
+  <!-- Modal de vídeo -->
+  <div id="videoModal">
+    <button id="closeModal">Fechar</button>
+    <h2 id="videoTitle">Mensagem do Padre</h2>
+    <video id="videoPlayer" controls></video>
+  </div>
+
+  <!-- opcional: suicidio.m4a -->
   <audio id="audioSuicidio" src="suicidio.m4a" preload="auto"></audio>
 
 <script>
-/* ===================== Utilidades ===================== */
-// normaliza: minúsculas + remove acentos (compatível com navegadores)
-function norm(s){
-  return (s||'')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g,'');
-}
+function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 function showWarn(msg){
   const w=document.getElementById('warn');
-  w.textContent=msg;
-  w.style.display='block';
+  w.textContent=msg;w.style.display='block';
   clearTimeout(showWarn._t);
-  showWarn._t=setTimeout(()=>{ w.style.display='none'; }, 4000);
+  showWarn._t=setTimeout(()=>{w.style.display='none';},4000);
 }
 
-/* ===================== Sinônimos / Palavras-chave ===================== */
-const TOPIC_KEYS = [
+/* ===================== Sinônimos ===================== */
+const TOPIC_KEYS=[
   {topic:'ansiedade',keys:['ansiedade','ansioso','ansiosa','preocupacao','preocupado','preocupada','aflicao','angustia','nervoso','panico','pânico']},
   {topic:'medo',keys:['medo','temor','assustado','assustada','pavor','receio']},
   {topic:'luto',keys:['luto','morte','falecimento','perda']},
   {topic:'suicidio',keys:['suicidio','suicídio','suicidou','tirou a vida']},
-  {topic:'desejo-suicidio',keys:['me matar','tirar a vida', 'tirar a minha vida','nao quero viver','não quero mais viver','suicidar']},
+  {topic:'desejo-suicidio',keys:['me matar','tirar a vida','tirar a minha vida','nao quero viver','não quero mais viver','suicidar']},
   {topic:'pecado',keys:['pecado','erro','falha','culpa','cometi']},
   {topic:'sofrimento',keys:['sofrimento','dor','provacao','provação','tribulacao','tribulação']},
   {topic:'angustia',keys:['angustia','angústia','aperto no coracao','aperto no coração']},
@@ -105,93 +121,18 @@ const TOPIC_KEYS = [
 ];
 
 /* ===================== Versículos ===================== */
-const VERSES = [
-  // ANSIEDADE
+const VERSES=[
   {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos... a paz de Deus guardará o coração.',note:'A ansiedade é colocada diante de Deus na oração.',prayer:'Senhor, entrego minhas preocupações a Ti.'},
-  {topic:'ansiedade',ref:'Mateus 6:34',text:'Não vos preocupeis com o dia de amanhã...',note:'Viva o presente com confiança.',prayer:'Pai, ajuda-me a confiar no hoje.'},
-  {topic:'ansiedade',ref:'Salmo 55:22',text:'Lança o teu cuidado sobre o Senhor, e Ele te susterá.',note:'Deus carrega os fardos.',prayer:'Sustenta-me, Senhor.'},
-
-  // MEDO
-  {topic:'medo',ref:'Isaías 41:10',text:'Não temas, porque Eu sou contigo.',note:'A presença de Deus dissipa o medo.',prayer:'Senhor, dá-me coragem.'},
-  {topic:'medo',ref:'Salmo 56:3',text:'Em me vindo o temor, confiarei em ti.',note:'A fé vence o medo.',prayer:'Que minha confiança supere o medo.'},
-
-  // LUTO
-  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida.',note:'Cristo consola na dor.',prayer:'Jesus, consola meu coração.'},
-  {topic:'luto',ref:'Salmo 34:18',text:'O Senhor está perto dos quebrantados.',note:'Deus ampara no luto.',prayer:'Sustenta-me em minha dor.'},
-
-  // SUICÍDIO / DESEJO DE MORTE
-  {topic:'suicidio',ref:'João 16:33',text:'No mundo tereis aflições, mas tende bom ânimo.',note:'Jesus traz esperança.',prayer:`Senhor Deus de infinita misericórdia,
-neste momento em que este(a) teu filho(a) se sente sobrecarregado(a), acolhe sua dor e derrama sobre ele(a) o Teu amor que cura e fortalece.
-Dissipa as trevas do desespero e faz nascer a luz da esperança.
-Envia pessoas que possam ajudá-lo(a) a encontrar apoio e novo sentido para a vida.
-Dá-lhe força para continuar, coragem para pedir ajuda e certeza de que não está só.
-Amém. 🙏
-
-🟢 Se você estiver passando por um momento difícil, ligue gratuitamente para o CVV – 188 (24h, sigiloso) ou acesse https://www.cvv.org.br
-🟢 Procure também apoio espiritual na sua comunidade.
-Sua vida é preciosa. Você não está sozinho(a). 🌱`},
-  {topic:'suicidio',ref:'Isaías 41:13',text:'Eu te ajudarei, diz o Senhor.',note:'Deus segura sua mão.',prayer:'Segura-me pela mão, Pai.'},
-  {topic:'desejo-suicidio',ref:'João 10:10',text:'Eu vim para que tenham vida...',note:'Jesus é vida abundante.',prayer:`Senhor Deus de infinita misericórdia,
-acolhe-me na Tua paz, afasta de mim a desesperança e renova em mim o desejo de viver. Amém. 🙏
-
-🟢 CVV – 188 • https://www.cvv.org.br (24h)
-Sua vida é valiosa. 🌱`},
-  {topic:'desejo-suicidio',ref:'Jeremias 29:11',text:'Tenho planos de paz...',note:'Deus tem futuro preparado.',prayer:'Revela-me Teus planos.'},
-
-  // CURA / SAÚDE
-  {topic:'cura',ref:'Salmo 103:3',text:'Ele perdoa todas as culpas e cura todas as enfermidades.',note:'Deus é quem sara.',prayer:'Cura-me e renova minhas forças.'},
-  {topic:'cura',ref:'Jeremias 17:14',text:'Cura-me, Senhor, e serei curado; salva-me, e serei salvo.',note:'Clamor por restauração.',prayer:'Restaura meu corpo e minha alma.'},
-  {topic:'cura',ref:'Tiago 5:14-15',text:'A oração da fé salvará o doente.',note:'A comunidade intercede e Deus age.',prayer:'Aumenta minha fé e concede saúde.'},
-
-  // FÉ
   {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza do que se espera...',note:'Convicção no invisível.',prayer:'Fortalece minha fé, Senhor.'},
-  {topic:'fe',ref:'Marcos 9:23',text:'Tudo é possível ao que crê.',note:'Confiança que move.',prayer:'Ajuda-me na minha pouca fé.'},
-
-  // ESPERANÇA
-  {topic:'esperanca',ref:'Romanos 15:13',text:'O Deus da esperança os encha de paz e alegria.',note:'Esperança que transborda.',prayer:'Enche-me de esperança e paz.'},
-  {topic:'esperanca',ref:'Lamentações 3:22-23',text:'As misericórdias do Senhor se renovam a cada manhã.',note:'Novo começo diário.',prayer:'Obrigado pela Tua fidelidade.'},
-
-  // SOFRIMENTO
-  {topic:'sofrimento',ref:'Romanos 8:18',text:'Os sofrimentos de agora não se comparam com a glória futura.',note:'Olhar para o eterno.',prayer:'Dá-me perseverança na dor.'},
-  {topic:'sofrimento',ref:'1 Pedro 5:10',text:'Depois de padecer, Ele vos restaurará e fortalecerá.',note:'Deus firma os passos.',prayer:'Restaura-me e fortalece-me.'},
-
-  // PECADO
-  {topic:'pecado',ref:'1 João 1:9',text:'Se confessarmos, Ele é fiel e justo para perdoar.',note:'Perdão e purificação.',prayer:'Cria em mim um coração puro.'},
-
-  // REZAR / ORAÇÃO
-  {topic:'rezar',ref:'Filipenses 4:6',text:'Em tudo, pela oração e súplicas, apresentem seus pedidos a Deus.',note:'Ore com gratidão.',prayer:'Recebe minhas súplicas e dá-me paz.'},
-  {topic:'rezar',ref:'Mateus 7:7',text:'Peçam, e lhes será dado; busquem, e acharão.',note:'Deus responde.',prayer:'Ensina-me a pedir com fé.'},
-
-  // GRAÇA
-  {topic:'graca',ref:'2 Coríntios 12:9',text:'Minha graça te basta; meu poder se aperfeiçoa na fraqueza.',note:'Suficiência da graça.',prayer:'Que Tua graça me sustente hoje.'},
-
-  // ANGÚSTIA / TRISTEZA
-  {topic:'angustia',ref:'Salmo 46:1',text:'Deus é refúgio e fortaleza, socorro bem presente na angústia.',note:'Abrigo em tempos difíceis.',prayer:'Sê meu refúgio agora.'},
-  {topic:'tristeza',ref:'Mateus 11:28',text:'Vinde a mim, todos os cansados e oprimidos...',note:'Descanso para a alma.',prayer:'Em Ti encontro descanso.'},
-
-  // FAMÍLIA
-  {topic:'familia',ref:'Provérbios 22:6',text:'Instrui a criança no caminho, e não se desviará.',note:'Educar com amor.',prayer:'Abençoa minha casa e meus filhos.'}
+  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida.',note:'Cristo consola na dor.',prayer:'Jesus, consola meu coração.'}
 ];
 
-/* ===================== Estado ===================== */
-let currentList = [];
-let idx = 0;
+let currentList=[];let idx=0;
 
-/* ===================== Áudio ===================== */
-function playAudioIfNeeded(topic){
-  const audio=document.getElementById('audioSuicidio');
-  if(!audio) return;
-  if(topic==='suicidio' || topic==='desejo-suicidio'){
-    try{ audio.currentTime=0; audio.play().catch(()=>{}); }catch(_){}
-  }else{
-    try{ audio.pause(); audio.currentTime=0; }catch(_){}
-  }
-}
-
-/* ===================== Render ===================== */
+/* ===================== Renderização ===================== */
 function renderCurrent(){
   const box=document.getElementById('result');
-  if(!currentList.length){ box.style.display='none'; return; }
+  if(!currentList.length){box.style.display='none';return;}
   const item=currentList[idx % currentList.length];
   document.getElementById('verse').textContent='“'+item.text+'”';
   document.getElementById('ref').textContent=item.ref+' • tema: '+item.topic;
@@ -199,91 +140,77 @@ function renderCurrent(){
   document.getElementById('devocional').textContent=item.note;
   document.getElementById('oracao').textContent=item.prayer;
   box.style.display='block';
-  playAudioIfNeeded(item.topic);
 }
 
 /* ===================== Busca de tema ===================== */
 function findTopic(inputRaw){
-  const s = norm(inputRaw);
-  for(const t of TOPIC_KEYS){
-    for(const k of t.keys){
-      if(s.includes(norm(k))) return t.topic;
-    }
-  }
+  const s=norm(inputRaw);
+  for(const t of TOPIC_KEYS){for(const k of t.keys){if(s.includes(norm(k)))return t.topic;}}
   return null;
 }
 
 /* ===================== Ações ===================== */
 function compute(){
-  try{
-    const input = document.getElementById('input').value || '';
-    const foundTopic = findTopic(input);
-
-    if(foundTopic){
-      let list = VERSES.filter(v => v.topic === foundTopic);
-
-      // Fallback: reconheceu o tema mas não há passagens cadastradas
-      if(!list.length){
-        showWarn(`Tema reconhecido (“${foundTopic}”), mas ainda sem passagens cadastradas. Mostrando conselhos gerais.`);
-        const fallbackPool = VERSES.filter(v => ['esperanca','fe','ansiedade','sofrimento'].includes(v.topic));
-        list = fallbackPool.length ? fallbackPool : VERSES;
-      }
-      currentList = list;
-    }else{
-      // Nenhum tema reconhecido
-      showWarn('Não identifiquei um tema específico. Mostrando um conselho aleatório.');
-      currentList = [VERSES[Math.floor(Math.random()*VERSES.length)]];
-    }
-
-    idx = 0;
-    renderCurrent();
-  }catch(err){
-    console.error(err);
-    showWarn('Ocorreu um erro inesperado. Tente novamente.');
-  }
+  const input=document.getElementById('input').value||'';
+  let foundTopic=findTopic(input);
+  if(!foundTopic) foundTopic='fe';
+  let list=VERSES.filter(v=>v.topic===foundTopic);
+  if(!list.length){showWarn(`Tema reconhecido (“${foundTopic}”), mas sem passagens cadastradas.`);list=[VERSES[0]];}
+  currentList=list;idx=0;renderCurrent();
 }
-function randomVerse(){
-  currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];
-  idx=0; renderCurrent();
-}
-function clearInput(){
-  document.getElementById('input').value='';
-  document.getElementById('result').style.display='none';
-}
-function nextSameTheme(){
-  if(!currentList.length) return;
-  idx=(idx+1)%currentList.length;
-  renderCurrent();
-}
+function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();}
+function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
 function copyVerse(){
-  if(!currentList.length) return;
+  if(!currentList.length)return;
   const i=currentList[idx];
   const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>showWarn('Copiado!'));
-  }
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showWarn('Copiado!'));}
 }
 function shareVerse(){
-  if(!currentList.length) return;
+  if(!currentList.length)return;
   const i=currentList[idx];
   const text=`${i.ref}\n${i.text}\nComentário: ${i.note}\nOração: ${i.prayer}`;
-  if(navigator.share){ navigator.share({title:'Conselho Bíblico',text}); }
-  else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>showWarn('Copiado para compartilhar!')); }
+  if(navigator.share){navigator.share({title:'Conselho Bíblico',text});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showWarn('Copiado para compartilhar!'));}
 }
 
-/* ===================== Liga botões e atalhos ===================== */
-document.getElementById('btnFind').addEventListener('click', compute);
-document.getElementById('btnSurprise').addEventListener('click', randomVerse);
-document.getElementById('btnClear').addEventListener('click', clearInput);
-document.getElementById('btnNext').addEventListener('click', nextSameTheme);
-document.getElementById('btnCopy').addEventListener('click', copyVerse);
-document.getElementById('btnShare').addEventListener('click', shareVerse);
+/* ===================== Modal de Vídeo ===================== */
+function openPadreMessage(){
+  if(!currentList.length)return;
+  const topic=currentList[idx].topic;
+  const videoSrc=`${topic}.mp4`;
+  const video=document.getElementById('videoPlayer');
+  const modal=document.getElementById('videoModal');
+  const title=document.getElementById('videoTitle');
+  fetch(videoSrc,{method:'HEAD'}).then(resp=>{
+    if(resp.ok){
+      title.textContent=`Mensagem do Padre – ${topic.toUpperCase()}`;
+      video.src=videoSrc;
+      modal.classList.add('active');
+      setTimeout(()=>modal.style.opacity=1,10);
+      video.play();
+    }else{showWarn('Mensagem do Padre não disponível para este tema.');}
+  }).catch(()=>showWarn('Mensagem do Padre não disponível para este tema.'));
+}
+function closeModal(){
+  const modal=document.getElementById('videoModal');
+  const video=document.getElementById('videoPlayer');
+  video.pause();video.src='';
+  modal.style.opacity=0;
+  setTimeout(()=>modal.classList.remove('active'),300);
+}
 
-// Ctrl/Cmd+Enter no textarea dispara busca
-document.getElementById('input').addEventListener('keydown', (e)=>{
-  if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ compute(); }
+/* ===================== Eventos ===================== */
+document.getElementById('btnFind').addEventListener('click',compute);
+document.getElementById('btnSurprise').addEventListener('click',randomVerse);
+document.getElementById('btnClear').addEventListener('click',clearInput);
+document.getElementById('btnCopy').addEventListener('click',copyVerse);
+document.getElementById('btnShare').addEventListener('click',shareVerse);
+document.getElementById('btnPadre').addEventListener('click',openPadreMessage);
+document.getElementById('closeModal').addEventListener('click',closeModal);
+document.getElementById('input').addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){compute();}
 });
 </script>
 </body>
 </html>
-
