@@ -86,7 +86,6 @@
     <video id="videoPlayer" controls></video>
   </div>
 
-  <!-- opcional: suicidio.m4a -->
   <audio id="audioSuicidio" src="suicidio.m4a" preload="auto"></audio>
 
 <script>
@@ -100,6 +99,7 @@ function showWarn(msg){
 
 /* ===================== Sinônimos ===================== */
 const TOPIC_KEYS=[
+  {topic:'cura',keys:['cura','saude','saúde','doenca','doença','enfermidade','saudavel','doente','enfermo','hospital','internacao','internação','cirurgia','tratamento']},
   {topic:'ansiedade',keys:['ansiedade','ansioso','ansiosa','preocupacao','preocupado','preocupada','aflicao','angustia','nervoso','panico','pânico']},
   {topic:'medo',keys:['medo','temor','assustado','assustada','pavor','receio']},
   {topic:'luto',keys:['luto','morte','falecimento','perda']},
@@ -112,7 +112,6 @@ const TOPIC_KEYS=[
   {topic:'rezar',keys:['rezar','oracao','oração','pedir','suplica','súplica','orar','rosario','terço']},
   {topic:'esperanca',keys:['esperanca','esperança','confianca','confiança','futuro','sem esperanca','sem esperança']},
   {topic:'fe',keys:['fe','fé','crenca','crença','acreditar','sem fe','sem fé']},
-  {topic:'cura',keys:['cura','saude','saúde','doenca','doença','enfermidade','saudavel','doente','enfermo','hospital','internacao','internação','cirurgia','tratamento']},
   {topic:'familia',keys:['familia','família','casa','lar','filhos','casamento','meu filho','minha mae','minha mãe','meu pai']},
   {topic:'solidao',keys:['solidao','solidão','sozinho','sozinha','abandono','isolado','isolada']},
   {topic:'tristeza',keys:['tristeza','triste','abatido','desanimo','desânimo','chorar','depressao','depressão']},
@@ -122,12 +121,28 @@ const TOPIC_KEYS=[
 
 /* ===================== Versículos ===================== */
 const VERSES=[
+  {topic:'cura',ref:'Salmo 103:3',text:'Ele perdoa todas as culpas e cura todas as enfermidades.',note:'Deus é quem sara.',prayer:'Cura-me e renova minhas forças.'},
+  {topic:'cura',ref:'Jeremias 17:14',text:'Cura-me, Senhor, e serei curado; salva-me, e serei salvo.',note:'Clamor por restauração.',prayer:'Restaura meu corpo e minha alma.'},
+  {topic:'cura',ref:'Tiago 5:14-15',text:'A oração da fé salvará o doente.',note:'A comunidade intercede e Deus age.',prayer:'Aumenta minha fé e concede saúde.'},
   {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos... a paz de Deus guardará o coração.',note:'A ansiedade é colocada diante de Deus na oração.',prayer:'Senhor, entrego minhas preocupações a Ti.'},
   {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza do que se espera...',note:'Convicção no invisível.',prayer:'Fortalece minha fé, Senhor.'},
   {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida.',note:'Cristo consola na dor.',prayer:'Jesus, consola meu coração.'}
 ];
 
 let currentList=[];let idx=0;
+
+/* ===================== Busca de tema ===================== */
+function findTopic(inputRaw){
+  const s=norm(inputRaw);
+  let matches=[];
+  for(const t of TOPIC_KEYS){
+    for(const k of t.keys){
+      if(s.includes(norm(k))) matches.push(t.topic);
+    }
+  }
+  if(matches.length) return matches[0];
+  return null;
+}
 
 /* ===================== Renderização ===================== */
 function renderCurrent(){
@@ -142,13 +157,6 @@ function renderCurrent(){
   box.style.display='block';
 }
 
-/* ===================== Busca de tema ===================== */
-function findTopic(inputRaw){
-  const s=norm(inputRaw);
-  for(const t of TOPIC_KEYS){for(const k of t.keys){if(s.includes(norm(k)))return t.topic;}}
-  return null;
-}
-
 /* ===================== Ações ===================== */
 function compute(){
   const input=document.getElementById('input').value||'';
@@ -158,6 +166,7 @@ function compute(){
   if(!list.length){showWarn(`Tema reconhecido (“${foundTopic}”), mas sem passagens cadastradas.`);list=[VERSES[0]];}
   currentList=list;idx=0;renderCurrent();
 }
+
 function randomVerse(){currentList=[VERSES[Math.floor(Math.random()*VERSES.length)]];idx=0;renderCurrent();}
 function clearInput(){document.getElementById('input').value='';document.getElementById('result').style.display='none';}
 function copyVerse(){
@@ -182,15 +191,11 @@ function openPadreMessage(){
   const video=document.getElementById('videoPlayer');
   const modal=document.getElementById('videoModal');
   const title=document.getElementById('videoTitle');
-  fetch(videoSrc,{method:'HEAD'}).then(resp=>{
-    if(resp.ok){
-      title.textContent=`Mensagem do Padre – ${topic.toUpperCase()}`;
-      video.src=videoSrc;
-      modal.classList.add('active');
-      setTimeout(()=>modal.style.opacity=1,10);
-      video.play();
-    }else{showWarn('Mensagem do Padre não disponível para este tema.');}
-  }).catch(()=>showWarn('Mensagem do Padre não disponível para este tema.'));
+  title.textContent=`Mensagem do Padre – ${topic.toUpperCase()}`;
+  video.src=videoSrc;
+  modal.classList.add('active');
+  setTimeout(()=>modal.style.opacity=1,10);
+  video.play().catch(()=>showWarn('Não foi possível reproduzir o vídeo.'));
 }
 function closeModal(){
   const modal=document.getElementById('videoModal');
