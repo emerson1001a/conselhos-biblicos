@@ -120,16 +120,138 @@ const TOPIC_KEYS=[
 ];
 
 /* ===================== Versículos ===================== */
-const VERSES=[
-  {topic:'cura',ref:'Salmo 103:3',text:'Ele perdoa todas as culpas e cura todas as enfermidades.',note:'Deus é quem sara.',prayer:'Cura-me e renova minhas forças.'},
-  {topic:'cura',ref:'Jeremias 17:14',text:'Cura-me, Senhor, e serei curado; salva-me, e serei salvo.',note:'Clamor por restauração.',prayer:'Restaura meu corpo e minha alma.'},
-  {topic:'cura',ref:'Tiago 5:14-15',text:'A oração da fé salvará o doente.',note:'A comunidade intercede e Deus age.',prayer:'Aumenta minha fé e concede saúde.'},
-  {topic:'ansiedade',ref:'Filipenses 4:6-7',text:'Não andeis ansiosos... a paz de Deus guardará o coração.',note:'A ansiedade é colocada diante de Deus na oração.',prayer:'Senhor, entrego minhas preocupações a Ti.'},
-  {topic:'fe',ref:'Hebreus 11:1',text:'A fé é a certeza do que se espera...',note:'Convicção no invisível.',prayer:'Fortalece minha fé, Senhor.'},
-  {topic:'luto',ref:'João 11:25',text:'Eu sou a ressurreição e a vida.',note:'Cristo consola na dor.',prayer:'Jesus, consola meu coração.'}
+/* ===================== Versículos e Conselhos ===================== */
+const VERSES = [
+  {
+    topic: 'cura',
+    ref: 'Isaías 38:16-20',
+    text: '“Senhor, por estes sofrimentos vive o homem, e neles está a vida do meu espírito. Curaste-me e preservaste a minha vida. Eis que foi para a minha paz que tive grande amargura; mas Tu, por amor à minha alma, livraste-a do abismo da destruição, lançaste para trás de Ti todos os meus pecados. Pois não é o túmulo que Te louva, nem a morte que Te celebra; mas o vivo, o vivo é quem Te louva, como eu hoje.”',
+    note: 'Deus é Aquele que transforma a dor em caminho de cura e a enfermidade em oportunidade de fé. Mesmo quando a fraqueza humana se manifesta, o Senhor permanece fiel e age silenciosamente para restaurar o corpo e a alma.',
+    prayer: 'Senhor Jesus, Médico das almas e dos corpos, vem em meu auxílio neste momento de enfermidade. Toca com Tuas mãos santas as feridas do meu corpo e as angústias do meu coração. Que a minha dor se torne caminho de fé e que a Tua vontade se cumpra em mim. Cura-me, Senhor, e faz de mim instrumento da Tua paz e esperança. Amém.'
+  },
+  {
+    topic: 'ansiedade',
+    ref: 'Mateus 6:25-34',
+    text: '“Não vos preocupeis, pois, dizendo: Que comeremos? Que beberemos? Com que nos vestiremos? Vosso Pai celeste sabe que precisais de tudo isso. Buscai primeiro o Reino de Deus e a sua justiça, e todas essas coisas vos serão dadas em acréscimo.”',
+    note: 'A ansiedade é um peso que nasce quando tentamos controlar o que só Deus pode conduzir. A confiança no Pai liberta o coração do medo e traz serenidade à alma.',
+    prayer: 'Pai amado, em meio às preocupações e ao turbilhão dos pensamentos, ensina-me a descansar em Ti. Que eu saiba entregar em Tuas mãos o que não posso mudar e confiar que o Teu cuidado é perfeito. Acalma meu coração e concede-me a paz que só o Teu Espírito pode dar. Amém.'
+  },
+  {
+    topic: 'medo',
+    ref: 'Isaías 41:10-13',
+    text: '“Não temas, porque Eu estou contigo; não te assombres, porque Eu sou o teu Deus; Eu te fortaleço, venho em teu auxílio, e te sustento com a destra da minha justiça. Pois Eu, o Senhor teu Deus, te tomo pela mão e te digo: Não temas, Eu te ajudarei.”',
+    note: 'Deus não promete ausência de dificuldades, mas presença constante. Quando o medo paralisa, é a confiança no Senhor que renova as forças e faz o impossível florescer.',
+    prayer: 'Senhor, nas horas em que o medo me cerca e a incerteza me abate, segura firme a minha mão. Dá-me coragem para seguir mesmo quando não vejo o caminho. Que eu sinta Tua presença me sustentando e que o Teu amor vença em mim todo temor. Amém.'
+  },
+  {
+    topic: 'luto',
+    ref: 'João 11:25-26',
+    text: '“Disse-lhe Jesus: Eu sou a ressurreição e a vida. Quem crê em Mim, ainda que morra, viverá; e todo aquele que vive e crê em Mim jamais morrerá.”',
+    note: 'O luto é o eco do amor que permanece. Cristo nos recorda que a morte não é o fim, mas uma passagem para a vida eterna. Em meio à saudade, Ele consola e promete reencontro.',
+    prayer: 'Senhor Jesus, que choraste diante do túmulo de Lázaro, acolhe minha dor e transforma minha saudade em esperança. Conforta o meu coração e dá descanso eterno àqueles que partiram. Que eu creia, mesmo entre lágrimas, que a vida venceu a morte em Ti. Amém.'
+  },
+  {
+    topic: 'suicidio',
+    ref: 'Salmo 34:18-20',
+    text: '“Perto está o Senhor dos corações quebrantados, e salva os de espírito abatido. Muitas são as aflições do justo, mas o Senhor o livra de todas.”',
+    note: 'Quando a escuridão parece total, Deus ainda está presente. Ele não rejeita quem sofre, mas acolhe, consola e oferece nova razão para viver. Nenhum sofrimento é maior que o amor de Deus.',
+    prayer: 'Senhor da vida, acolhe em Teu coração todos os que estão cansados e sobrecarregados. Dissipa as trevas do desespero e faz brilhar a luz da esperança. Envia o Teu Espírito Santo para consolar, curar e fortalecer. Que ninguém se sinta sozinho, e que toda alma ferida reencontre em Ti o sentido da vida. Amém.'
+  },
+  {
+    topic: 'desejo-suicidio',
+    ref: 'Jeremias 29:11-13',
+    text: '“Eu é que sei os pensamentos que tenho a vosso respeito, diz o Senhor: pensamentos de paz e não de desgraça, para vos dar um futuro cheio de esperança. Então Me invocareis, e Eu vos ouvirei. Buscar-Me-eis e Me achareis, quando Me buscardes de todo o vosso coração.”',
+    note: 'Mesmo quando a dor grita e o desespero parece dominar, Deus ainda sonha conosco. Ele prepara novos caminhos e quer restaurar a vida, pois a esperança é o fio invisível que nos liga ao Seu amor.',
+    prayer: 'Senhor, nos momentos em que a dor parece insuportável e a vida perde o sentido, não me deixes cair. Dá-me coragem para pedir ajuda e fé para acreditar que Tua mão me ergue. Reacende em mim o desejo de viver e a confiança em Teus planos de amor. Amém.'
+  },
+  {
+    topic: 'pecado',
+    ref: '1 João 1:8-9',
+    text: '“Se dissermos que não temos pecado, enganamo-nos a nós mesmos, e a verdade não está em nós. Mas, se confessarmos os nossos pecados, Ele é fiel e justo para nos perdoar e purificar de toda iniquidade.”',
+    note: 'Deus não se cansa de perdoar; nós é que nos cansamos de pedir perdão. O arrependimento sincero abre o coração à misericórdia infinita do Pai.',
+    prayer: 'Senhor Jesus, fonte de misericórdia, reconheço minhas faltas e confio no Teu perdão. Lava-me com o Teu sangue redentor e cria em mim um coração puro. Que eu nunca me afaste de Ti por vergonha, mas sempre volte por amor. Amém.'
+  },
+  {
+    topic: 'sofrimento',
+    ref: 'Romanos 8:18-28',
+    text: '“Os sofrimentos do tempo presente não têm proporção com a glória que nos há de ser revelada. Sabemos que todas as coisas concorrem para o bem daqueles que amam a Deus.”',
+    note: 'Nenhuma dor é inútil quando colocada nas mãos de Deus. Ele transforma lágrimas em sementes de fé e sofrimento em caminho de santificação.',
+    prayer: 'Senhor, dá-me força para suportar o peso da cruz que me confiaste. Ensina-me a unir minhas dores às Tuas e a ver além da dor o mistério da Tua vontade. Que o sofrimento me purifique e me conduza à paz eterna. Amém.'
+  },
+  {
+    topic: 'angustia',
+    ref: 'Salmo 94:18-19',
+    text: '“Quando eu dizia: Meu pé vacila, a Tua bondade, Senhor, me sustinha. Quando a multidão dos meus temores se multiplicava dentro de mim, as Tuas consolações alegravam a minha alma.”',
+    note: 'A angústia é o clamor silencioso da alma que precisa ser ouvida por Deus. Ele não despreza quem sofre em silêncio; Ele entra na dor e a transforma em consolo.',
+    prayer: 'Senhor, quando a angústia me aperta e o coração se inquieta, vem em meu socorro. Senta-Te ao meu lado e faz calar as vozes do medo. Que a Tua presença me traga consolo e serenidade. Amém.'
+  },
+  {
+    topic: 'graca',
+    ref: '2 Coríntios 12:9-10',
+    text: '“A minha graça te basta, porque é na fraqueza que se aperfeiçoa o meu poder. De boa vontade, pois, me gloriarei nas minhas fraquezas, para que habite em mim a força de Cristo.”',
+    note: 'A graça de Deus não elimina as lutas, mas dá força para vencê-las. Quando reconhecemos nossa fragilidade, abrimos espaço para que o poder divino nos sustente.',
+    prayer: 'Senhor, que Tua graça seja o meu sustento e a minha alegria. Quando eu me sentir fraco, recorda-me que em Ti encontro força. Que a Tua graça me baste em todas as circunstâncias. Amém.'
+  },
+  {
+    topic: 'rezar',
+    ref: 'Filipenses 4:6-7',
+    text: '“Em tudo, apresentai a Deus as vossas petições por meio da oração e da súplica, com ações de graças. E a paz de Deus, que excede toda a inteligência, guardará os vossos corações em Cristo Jesus.”',
+    note: 'A oração é o fio invisível que nos liga ao coração de Deus. É nela que a alma se acalma e o Espírito fala mais forte que o medo.',
+    prayer: 'Senhor, ensina-me a rezar com o coração e não apenas com palavras. Que eu saiba Te escutar no silêncio e confiar mesmo sem compreender. Que minha vida se torne uma oração viva, cheia de gratidão e amor. Amém.'
+  },
+  {
+    topic: 'esperanca',
+    ref: 'Romanos 5:3-5',
+    text: '“Gloriemo-nos também nas tribulações, sabendo que a tribulação produz a paciência, a paciência a virtude provada, e a virtude provada gera a esperança. E a esperança não decepciona, porque o amor de Deus foi derramado em nossos corações pelo Espírito Santo.”',
+    note: 'A esperança é o farol que brilha mesmo nas noites escuras. Ela nasce da fé e se alimenta do amor que Deus coloca em cada coração.',
+    prayer: 'Senhor, quando tudo parecer perdido, renova em mim a chama da esperança. Que eu creia que Teus planos são maiores que os meus medos. Dá-me olhos de fé para ver Tua luz mesmo nas trevas. Amém.'
+  },
+  {
+    topic: 'fe',
+    ref: 'Marcos 9:23-24',
+    text: '“Tudo é possível àquele que crê. E o pai do menino exclamou: Creio, Senhor! Mas ajuda a minha incredulidade.”',
+    note: 'A fé não é ausência de dúvida, mas confiança mesmo quando não entendemos. É caminhar com os olhos voltados para Deus, acreditando que Ele guia os passos.',
+    prayer: 'Senhor, aumenta a minha fé. Quando as dúvidas me cercarem, que eu me recorde das Tuas promessas. Ensina-me a confiar mais no Teu amor do que nos meus medos. Amém.'
+  },
+  {
+    topic: 'familia',
+    ref: 'Colossenses 3:12-15',
+    text: '“Revesti-vos, pois, de sentimentos de misericórdia, de bondade, humildade, mansidão e paciência. Suportai-vos uns aos outros e perdoai-vos mutuamente. E que a paz de Cristo reine em vossos corações.”',
+    note: 'A família é o primeiro templo onde aprendemos a amar. Quando há perdão e paciência, Deus habita o lar e o transforma em refúgio de amor.',
+    prayer: 'Senhor, abençoa minha família e faz do nosso lar um lugar de acolhida e paz. Ensina-nos a perdoar, a compreender e a amar como Tu nos amas. Que a Tua presença seja o centro da nossa casa. Amém.'
+  },
+  {
+    topic: 'solidao',
+    ref: 'Salmo 25:16-18',
+    text: '“Volta-Te para mim e tem piedade, porque estou só e na miséria. Alivia as angústias do meu coração e livra-me das aflições.”',
+    note: 'A solidão não é ausência de companhia, mas o grito por presença verdadeira. Deus nunca abandona os que se sentem sós; Ele habita o silêncio e o transforma em encontro.',
+    prayer: 'Senhor, nas horas em que me sinto só, faz-me perceber que Tu estás comigo. Que a Tua presença me baste e que eu saiba encontrar em Ti o consolo e a amizade que o mundo não pode dar. Amém.'
+  },
+  {
+    topic: 'tristeza',
+    ref: 'Salmo 30:11-12',
+    text: '“Converteste o meu pranto em alegria, desataste o meu cilício e cingiste-me de júbilo. Por isso, a minha alma Te louvará eternamente.”',
+    note: 'A tristeza é o inverno da alma, mas o amor de Deus é a primavera que sempre volta. Mesmo quando o choro dura a noite, a alegria renasce ao amanhecer.',
+    prayer: 'Senhor, transforma minha tristeza em louvor e meu desânimo em gratidão. Que eu saiba encontrar sentido até nas lágrimas e confiar que o Teu amor tudo renova. Amém.'
+  },
+  {
+    topic: 'alegria',
+    ref: 'Filipenses 4:4-7',
+    text: '“Alegrai-vos sempre no Senhor. Repito: alegrai-vos! Que a vossa bondade seja conhecida de todos. O Senhor está perto.”',
+    note: 'A verdadeira alegria nasce da certeza da presença de Deus. Não depende de circunstâncias, mas de uma alma que encontrou descanso no amor do Senhor.',
+    prayer: 'Senhor, ensina-me a viver com alegria mesmo em meio às dificuldades. Que minha felicidade seja reflexo da Tua presença e contagie todos ao meu redor com Tua luz. Amém.'
+  },
+  {
+    topic: 'amor',
+    ref: '1 Coríntios 13:4-7',
+    text: '“O amor é paciente, o amor é bondoso. Não é invejoso, não se vangloria, não se orgulha. Tudo crê, tudo espera, tudo suporta.”',
+    note: 'O amor é o reflexo mais puro de Deus no coração humano. Quando amamos, participamos do próprio mistério divino e tornamo-nos sinais da presença do Pai.',
+    prayer: 'Senhor, ensina-me a amar como Tu amas: sem limites, sem medo e sem esperar nada em troca. Que o Teu amor me transforme e me faça instrumento de Tua misericórdia neste mundo. Amém.'
+  }
 ];
 
-let currentList=[];let idx=0;
+let currentList = [];
+let idx = 0;
 
 /* ===================== Busca de tema ===================== */
 function findTopic(inputRaw){
